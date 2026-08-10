@@ -50,7 +50,14 @@ def check_anthropic():
         return record("Anthropic", "SKIPPED", "pip install -r requirements.txt first")
     try:
         client = anthropic.Anthropic(api_key=key)
-        client.models.list(limit=1)
+        # This SDK version (0.40.0) has no `models` resource to probe with -
+        # a 1-token message is the real lightweight auth check here. Tiny
+        # real cost (a handful of tokens), not free, but negligible.
+        client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=1,
+            messages=[{"role": "user", "content": "hi"}],
+        )
         record("Anthropic", "OK", "key authenticates")
     except Exception as e:
         record("Anthropic", "FAIL", str(e)[:200])
