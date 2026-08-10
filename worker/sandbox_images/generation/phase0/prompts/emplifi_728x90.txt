@@ -1,0 +1,26 @@
+Full-bleed banner marketing background, 728x90, exactly 8.09:1 aspect ratio
+(extreme wide leaderboard format - keep the composition very simple, this
+ratio has almost no vertical room for detail).
+
+Subject and composition: a flat deep navy (#0C3B5D) field across the entire
+banner. A single small periwinkle (#6765FE) geometric accent - a thin arc or
+a small soft-edged circle - anchored at the far right edge only, occupying no
+more than the rightmost 15% of the width. The remaining ~85% (left side and
+center) stays a clean, completely flat navy field with zero shapes, gradients,
+or texture crossing it, so text can sit on top with full contrast across the
+entire readable width.
+
+Lighting and texture: flat, even color, no gradient banding, no grain, no
+photographic texture.
+
+Palette: only #0C3B5D and #6765FE. No orange anywhere in this image.
+
+Strictly prohibited: no words, letters, numbers, logos, badges, button
+shapes, watermarks, signatures, or UI-like text anywhere. Textless, logo-free
+background plate only.
+
+Note for whoever fires this prompt: this is the size most likely to get
+rejected outright by the image API (extreme aspect ratio). If it is rejected,
+that is a Step 1 finding - record the exact rejection reason in
+worker/sandbox_images/generation/phase0/README.md rather than substituting a
+cropped/stretched plate from a different ratio.

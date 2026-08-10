@@ -1,0 +1,41 @@
+<!doctype html>
+<!-- Same campaign/copy as emplifi_1080x1080 (one request, multiple canvases).
+     Layout is its own judgment call for this aspect ratio, not a resize of
+     the square version - compact vertical stack to fit a 628px-tall frame,
+     positioned in the plate's actual left-two-thirds quiet zone. -->
+<html>
+<head>
+<style>
+  @font-face { font-family: "Inter"; font-weight: 600;
+    src: url("file:///C:/Users/adiks/OneDrive/Documents/characterquilt-work-trial/characterquilt-work-trial/design-brains/design-brains/emplifi/fonts/inter_600_normal.ttf"); }
+  @font-face { font-family: "Inter"; font-weight: 700;
+    src: url("file:///C:/Users/adiks/OneDrive/Documents/characterquilt-work-trial/characterquilt-work-trial/design-brains/design-brains/emplifi/fonts/inter_700_normal.ttf"); }
+  @font-face { font-family: "Inter"; font-weight: 400;
+    src: url("file:///C:/Users/adiks/OneDrive/Documents/characterquilt-work-trial/characterquilt-work-trial/design-brains/design-brains/emplifi/fonts/inter_400_normal.ttf"); }
+  html, body { margin: 0; padding: 0; }
+  .canvas { position: relative; width: 1200px; height: 628px; overflow: hidden; font-family: "Inter", sans-serif; }
+  .plate { position: absolute; inset: 0; width: 1200px; height: 628px; }
+  .logo { position: absolute; left: 56px; top: 40px; width: 140px; height: auto; }
+  .eyebrow { position: absolute; left: 56px; top: 116px; width: 600px;
+    font-weight: 600; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: #6765FE; }
+  .headline { position: absolute; left: 56px; top: 144px; width: 620px;
+    font-weight: 700; font-size: 40px; line-height: 1.12; color: #FFFFFF; }
+  .subhead { position: absolute; left: 56px; top: 292px; width: 560px;
+    font-weight: 400; font-size: 15px; line-height: 1.5; color: #94A9B8; }
+  .cta { position: absolute; left: 56px; top: 358px; display: inline-flex; align-items: center;
+    padding: 12px 24px; border: 2px solid #FF5A21; border-radius: 999px;
+    font-weight: 700; font-size: 15px; color: #FF5A21; background: transparent; }
+</style>
+</head>
+<body>
+  <div class="canvas">
+    <img class="plate" src="plate_real.png" />
+    <img class="logo" data-cq-role="logo"
+         src="file:///C:/Users/adiks/OneDrive/Documents/characterquilt-work-trial/characterquilt-work-trial/design-brains/design-brains/emplifi/brand/emplifi-logo-white.svg" />
+    <div class="eyebrow" data-cq-role="text">2026 Predictions</div>
+    <div class="headline" data-cq-role="text">Shoppable video becomes the default discovery surface</div>
+    <div class="subhead" data-cq-role="text">TikTok Shop now hosts 500,000+ US sellers. Your feed is a storefront.</div>
+    <div class="cta" data-cq-role="cta">Get the predictions</div>
+  </div>
+</body>
+</html>

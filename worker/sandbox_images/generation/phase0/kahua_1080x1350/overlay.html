@@ -1,0 +1,47 @@
+<!doctype html>
+<!-- Same campaign/copy as kahua_1080x1080/kahua_1200x628. This plate's quiet
+     zone is the bottom (wet concrete, medium-dark), not the top - a
+     genuinely different composition, not a copy of the other three.
+
+     Split placement: logo sits in the smaller clear sky patch at top-right
+     (away from the crane silhouette), where the ground is light enough for
+     the standard dark-ink kahua-logo.svg. Copy sits on the bottom concrete
+     zone in white, since that ground reads medium-dark, not light - the
+     opposite color choice from the square/landscape versions, made because
+     this render's actual tones are opposite theirs, not by default. -->
+<html>
+<head>
+<style>
+  @font-face { font-family: "Barlow"; font-weight: 400;
+    src: url("file:///C:/Users/adiks/OneDrive/Documents/characterquilt-work-trial/characterquilt-work-trial/design-brains/design-brains/kahua/fonts/barlow_400_normal.ttf"); }
+  @font-face { font-family: "Barlow"; font-weight: 600;
+    src: url("file:///C:/Users/adiks/OneDrive/Documents/characterquilt-work-trial/characterquilt-work-trial/design-brains/design-brains/kahua/fonts/barlow_600_normal.ttf"); }
+  @font-face { font-family: "Barlow"; font-weight: 700;
+    src: url("file:///C:/Users/adiks/OneDrive/Documents/characterquilt-work-trial/characterquilt-work-trial/design-brains/design-brains/kahua/fonts/barlow_700_normal.ttf"); }
+  html, body { margin: 0; padding: 0; }
+  .canvas { position: relative; width: 1080px; height: 1350px; overflow: hidden; font-family: "Barlow", sans-serif; }
+  .plate { position: absolute; inset: 0; width: 1080px; height: 1350px; }
+  .logo { position: absolute; left: 660px; top: 56px; width: 170px; height: auto; }
+  .eyebrow { position: absolute; left: 64px; top: 990px; width: 700px;
+    font-weight: 600; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: #F26B21; }
+  .headline { position: absolute; left: 64px; top: 1018px; width: 760px;
+    font-weight: 700; font-size: 48px; line-height: 1.1; color: #FFFFFF; }
+  .subhead { position: absolute; left: 64px; top: 1146px; width: 660px;
+    font-weight: 400; font-size: 17px; line-height: 1.5; color: #E4E8EC; }
+  .cta { position: absolute; left: 64px; top: 1222px; display: inline-flex; align-items: center;
+    padding: 15px 30px; border-radius: 4px;
+    font-weight: 600; font-size: 17px; color: #FFFFFF; background: #F26B21; }
+</style>
+</head>
+<body>
+  <div class="canvas">
+    <img class="plate" src="plate_real.png" />
+    <img class="logo" data-cq-role="logo"
+         src="file:///C:/Users/adiks/OneDrive/Documents/characterquilt-work-trial/characterquilt-work-trial/design-brains/design-brains/kahua/brand/kahua-logo.svg" />
+    <div class="eyebrow" data-cq-role="text">Field to Office</div>
+    <div class="headline" data-cq-role="text">Track every RFI before it becomes a change order</div>
+    <div class="subhead" data-cq-role="text">Kahua keeps RFIs, submittals and change orders on one timeline your whole team can see.</div>
+    <div class="cta" data-cq-role="cta">See how it works</div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,24 @@
+Full-bleed square marketing background, 1080x1080, exactly 1:1 aspect ratio.
+
+Subject and composition: a deep navy (#0C3B5D) ground filling the frame.
+In the lower half, an abstract suggestion of a product/UI surface - a soft,
+out-of-focus edge of a smartphone or tablet silhouette, implied through
+geometry rather than a literal screenshot. Frame that lower-right area with
+periwinkle (#6765FE) geometric shapes: one large soft-edged circle, one thin
+arc, and one delicate connecting line, arranged asymmetrically, flat vector-
+style fills with subtle gradient shading (not a 3D render, not glossy).
+
+Lighting and texture: even, high-contrast studio lighting, crisp clean edges,
+minimal fine grain texture only, no photographic texture, no lens flare, no
+bokeh.
+
+Negative space: keep the upper-left two-thirds of the frame a clean, low-
+detail navy field with no shapes crossing it - that region needs to stay
+visually quiet for text to sit on top later.
+
+Palette: only #0C3B5D (navy ground), #6765FE (periwinkle shapes), #FFFFFF
+(sparing highlight accents). Do not use orange anywhere in this image.
+
+Strictly prohibited: no words, letters, numbers, logos, badges, button
+shapes, watermarks, signatures, or any UI-like text anywhere in the image.
+This is a textless, logo-free background plate only.

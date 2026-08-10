@@ -1,0 +1,24 @@
+Full-bleed banner marketing background photograph, 728x90, exactly 8.09:1
+aspect ratio (extreme wide leaderboard format - almost no vertical room for
+detail, keep this very simple).
+
+Subject: a tight, cropped photographic detail of a real construction
+material or surface - e.g. a close, slightly blurred slice of a steel beam
+edge or poured concrete texture - filling the entire banner as a flat,
+low-detail band. Must read as genuinely material-real, never illustration,
+never a gradient.
+
+Color treatment: muted, cohesive grade toward Kahua navy (#1B3A5C).
+
+Negative space: the composition should be even and low-contrast enough
+across the whole width that text can be placed anywhere along it - no single
+bright or busy focal point.
+
+Strictly avoid: any readable text, numbers, logos, watermarks. No orange
+(#F26B21) anywhere in the plate.
+
+Note for whoever fires this prompt: this is the size most likely to get
+rejected outright by the image API (extreme aspect ratio). If rejected,
+record the exact rejection reason in
+worker/sandbox_images/generation/phase0/README.md as a Step 1 finding rather
+than substituting a cropped/stretched plate from a different ratio.

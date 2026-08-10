@@ -1,0 +1,111 @@
+<!doctype html>
+<!--
+Phase 0 proof of the HTML-overlay contract (SKILL.md).
+The background referenced here is plate_real.png, generated for real via
+gpt-image-2 from phase0/prompts/emplifi_1080x1080.txt (generated at
+1072x1072, the nearest divisible-by-16 same-ratio size, then uniformly
+resized to the exact 1080x1080 target - see tools/call_gpt_image.py).
+
+Font and image paths below are absolute to this machine on purpose - this is
+local Phase 0 dev only. Step 3's real hydration copies fonts/assets into the
+sandbox's own filesystem and references them by local sandbox path instead.
+-->
+<html>
+<head>
+<style>
+  @font-face {
+    font-family: "Inter";
+    src: url("file:///C:/Users/adiks/OneDrive/Documents/characterquilt-work-trial/characterquilt-work-trial/design-brains/design-brains/emplifi/fonts/inter_600_normal.ttf");
+    font-weight: 600;
+  }
+  @font-face {
+    font-family: "Inter";
+    src: url("file:///C:/Users/adiks/OneDrive/Documents/characterquilt-work-trial/characterquilt-work-trial/design-brains/design-brains/emplifi/fonts/inter_700_normal.ttf");
+    font-weight: 700;
+  }
+  @font-face {
+    font-family: "Inter";
+    src: url("file:///C:/Users/adiks/OneDrive/Documents/characterquilt-work-trial/characterquilt-work-trial/design-brains/design-brains/emplifi/fonts/inter_400_normal.ttf");
+    font-weight: 400;
+  }
+  html, body { margin: 0; padding: 0; }
+  .canvas {
+    position: relative;
+    width: 1080px;
+    height: 1080px;
+    overflow: hidden;
+    font-family: "Inter", sans-serif;
+  }
+  .plate {
+    position: absolute;
+    inset: 0;
+    width: 1080px;
+    height: 1080px;
+    object-fit: cover; /* placeholder only; a real plate is generated at exact bounds and needs no fit rule */
+  }
+  .logo {
+    position: absolute;
+    left: 64px;
+    top: 56px;
+    width: 160px;
+    height: auto;
+  }
+  .eyebrow {
+    position: absolute;
+    left: 64px;
+    top: 168px;
+    width: 640px;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #6765FE;
+  }
+  .headline {
+    position: absolute;
+    left: 64px;
+    top: 196px;
+    width: 660px;
+    font-weight: 700;
+    font-size: 48px;
+    line-height: 1.12;
+    color: #FFFFFF;
+  }
+  .subhead {
+    position: absolute;
+    left: 64px;
+    top: 400px;
+    width: 600px;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #94A9B8;
+  }
+  .cta {
+    position: absolute;
+    left: 64px;
+    top: 486px;
+    display: inline-flex;
+    align-items: center;
+    padding: 14px 28px;
+    border: 2px solid #FF5A21;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 16px;
+    color: #FF5A21;
+    background: transparent;
+  }
+</style>
+</head>
+<body>
+  <div class="canvas">
+    <img class="plate" src="plate_real.png" />
+    <img class="logo" data-cq-role="logo"
+         src="file:///C:/Users/adiks/OneDrive/Documents/characterquilt-work-trial/characterquilt-work-trial/design-brains/design-brains/emplifi/brand/emplifi-logo-white.svg" />
+    <div class="eyebrow" data-cq-role="text">2026 Predictions</div>
+    <div class="headline" data-cq-role="text">Shoppable video becomes the default discovery surface</div>
+    <div class="subhead" data-cq-role="text">TikTok Shop now hosts 500,000+ US sellers. Your feed is a storefront.</div>
+    <div class="cta" data-cq-role="cta">Get the predictions</div>
+  </div>
+</body>
+</html>

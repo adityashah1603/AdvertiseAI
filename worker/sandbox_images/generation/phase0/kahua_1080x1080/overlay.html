@@ -1,0 +1,120 @@
+<!doctype html>
+<!--
+Phase 0 proof for Kahua, real plate + real assets (SKILL.md contract).
+
+FINDING (2026-08-10): DESIGN.md specifies "heading: Barlow Condensed", but
+kahua/fonts/ only ships plain Barlow (400/500/600/700) - no Condensed file
+exists anywhere in the brain. Per SKILL.md's brand-binding rule ("every
+family named in DESIGN.md must be loaded from that brain's fonts/... browser
+fallback is not the brand"), substituting a browser-supplied Barlow
+Condensed would be worse than using the heaviest real shipped weight
+instead. Using Barlow 700 for the headline here - same type family, real
+shipped asset, not a fallback font - and documenting the gap rather than
+hiding it. Escalate for a real Barlow Condensed file before this goes to a
+real customer.
+
+FINDING (2026-08-10): the reverse/white logo referenced in
+asset_manifest.json (kahua-logo-white.svg) does not exist in kahua/brand/.
+The standard kahua-logo.svg has a dark ink (#16202B) wordmark, which only
+works on a light ground. Placed here over the plate's open-sky region
+(confirmed light gray after generation, not assumed) - if a future plate's
+sky isn't light enough, the logo must be omitted for that render, not forced.
+-->
+<html>
+<head>
+<style>
+  @font-face {
+    font-family: "Barlow";
+    src: url("file:///C:/Users/adiks/OneDrive/Documents/characterquilt-work-trial/characterquilt-work-trial/design-brains/design-brains/kahua/fonts/barlow_400_normal.ttf");
+    font-weight: 400;
+  }
+  @font-face {
+    font-family: "Barlow";
+    src: url("file:///C:/Users/adiks/OneDrive/Documents/characterquilt-work-trial/characterquilt-work-trial/design-brains/design-brains/kahua/fonts/barlow_600_normal.ttf");
+    font-weight: 600;
+  }
+  @font-face {
+    font-family: "Barlow";
+    src: url("file:///C:/Users/adiks/OneDrive/Documents/characterquilt-work-trial/characterquilt-work-trial/design-brains/design-brains/kahua/fonts/barlow_700_normal.ttf");
+    font-weight: 700;
+  }
+  html, body { margin: 0; padding: 0; }
+  .canvas {
+    position: relative;
+    width: 1080px;
+    height: 1080px;
+    overflow: hidden;
+    font-family: "Barlow", sans-serif;
+  }
+  .plate {
+    position: absolute;
+    inset: 0;
+    width: 1080px;
+    height: 1080px;
+  }
+  .logo {
+    position: absolute;
+    left: 64px;
+    top: 56px;
+    width: 180px;
+    height: auto;
+  }
+  .eyebrow {
+    position: absolute;
+    left: 64px;
+    top: 172px;
+    width: 640px;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #F26B21;
+  }
+  .headline {
+    /* Standing in for Barlow Condensed 700 - see file-top finding. */
+    position: absolute;
+    left: 64px;
+    top: 202px;
+    width: 720px;
+    font-weight: 700;
+    font-size: 48px; /* DESIGN.md: fixed at 48px on every canvas, never scaled */
+    line-height: 1.08;
+    color: #16202B;
+  }
+  .subhead {
+    position: absolute;
+    left: 64px;
+    top: 340px;
+    width: 620px;
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 1.5;
+    color: #6B7A88;
+  }
+  .cta {
+    position: absolute;
+    left: 64px;
+    top: 408px;
+    display: inline-flex;
+    align-items: center;
+    padding: 14px 28px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 16px;
+    color: #FFFFFF;
+    background: #F26B21;
+  }
+</style>
+</head>
+<body>
+  <div class="canvas">
+    <img class="plate" src="plate_real.png" />
+    <img class="logo" data-cq-role="logo"
+         src="file:///C:/Users/adiks/OneDrive/Documents/characterquilt-work-trial/characterquilt-work-trial/design-brains/design-brains/kahua/brand/kahua-logo.svg" />
+    <div class="eyebrow" data-cq-role="text">Field to Office</div>
+    <div class="headline" data-cq-role="text">Track every RFI before it becomes a change order</div>
+    <div class="subhead" data-cq-role="text">Kahua keeps RFIs, submittals and change orders on one timeline your whole team can see.</div>
+    <div class="cta" data-cq-role="cta">See how it works</div>
+  </div>
+</body>
+</html>

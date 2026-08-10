@@ -1,0 +1,23 @@
+Full-bleed square marketing background photograph, 1080x1080, exactly 1:1
+aspect ratio.
+
+Subject: a real active construction jobsite - steel structural framing, poured
+concrete decking, or civil infrastructure under construction - photographed
+from a slightly elevated angle, documentary/photojournalistic style. Overcast
+or early-morning natural daylight. This must read as a genuine jobsite, not a
+stock-office photo, not a rendering, not staged or posed workers.
+
+Color treatment: a muted, cohesive color grade consistent with Kahua's navy
+(#1B3A5C) - achieved through photographic color grading (cooler shadows,
+desaturated warm tones), not by painting flat color shapes into the image.
+
+Negative space: keep the upper third of the frame a relatively clean, low-
+detail plane (open sky, or a flat unobstructed concrete/steel surface) so
+text can sit there with strong contrast.
+
+Strictly avoid: any worker's face being prominent or identifiable (keep the
+frame wide/anonymous), visible signage, vehicle or equipment logos, readable
+text of any kind, numbers, watermarks. No orange (#F26B21) anywhere in the
+plate - orange is reserved entirely for the CTA overlay, never the
+background. No gradients, no illustration, no 3D render - this must be a
+believable photograph.

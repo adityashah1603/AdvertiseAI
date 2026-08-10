@@ -1,0 +1,20 @@
+Full-bleed portrait marketing background, 1080x1350, exactly 4:5 aspect ratio.
+
+Subject and composition: deep navy (#0C3B5D) ground filling the frame. In the
+lower third, periwinkle (#6765FE) geometric shapes - one large soft-edged
+circle, one thin arc, one delicate connecting line - arranged asymmetrically,
+suggesting the edge of a product/UI surface through geometry only. Flat
+vector-style fills with subtle gradient shading, not a 3D render.
+
+Lighting and texture: even, high-contrast, crisp edges, minimal fine grain
+only, no photographic texture, no lens flare.
+
+Negative space: keep the top two-thirds of the frame a clean, low-detail navy
+field with no shapes crossing it, for text to sit on top later.
+
+Palette: only #0C3B5D, #6765FE, sparing #FFFFFF highlights. No orange
+anywhere in this image.
+
+Strictly prohibited: no words, letters, numbers, logos, badges, button
+shapes, watermarks, signatures, or UI-like text anywhere. Textless, logo-free
+background plate only.

@@ -1,0 +1,51 @@
+<!doctype html>
+<!-- Same campaign/copy as kahua_1080x1080. Plate's quiet zone here is the
+     left third (overcast sky), medium-gray rather than the square version's
+     brighter sky - kept dark ink text (still strong contrast against a
+     mid-gray) rather than assuming white would work, per what this specific
+     render actually looks like, not what the square one looked like.
+
+     FINDING (2026-08-10): first pass used DESIGN.md's literal muted token
+     (#6B7A88) for the subhead and it was nearly illegible against this
+     sky - confirmed by actually rendering and looking, not assumed. Muted
+     is tuned for a flat/light surface; it has no guaranteed contrast against
+     a variable photograph. Darkened toward ink here (#2E3B45) to stay
+     legible while still reading as secondary to the headline. This is a
+     per-render judgment call, not a token change - DESIGN.md's muted value
+     is untouched, this is a documented photographic-ground exception. -->
+<html>
+<head>
+<style>
+  @font-face { font-family: "Barlow"; font-weight: 400;
+    src: url("file:///C:/Users/adiks/OneDrive/Documents/characterquilt-work-trial/characterquilt-work-trial/design-brains/design-brains/kahua/fonts/barlow_400_normal.ttf"); }
+  @font-face { font-family: "Barlow"; font-weight: 600;
+    src: url("file:///C:/Users/adiks/OneDrive/Documents/characterquilt-work-trial/characterquilt-work-trial/design-brains/design-brains/kahua/fonts/barlow_600_normal.ttf"); }
+  @font-face { font-family: "Barlow"; font-weight: 700;
+    src: url("file:///C:/Users/adiks/OneDrive/Documents/characterquilt-work-trial/characterquilt-work-trial/design-brains/design-brains/kahua/fonts/barlow_700_normal.ttf"); }
+  html, body { margin: 0; padding: 0; }
+  .canvas { position: relative; width: 1200px; height: 628px; overflow: hidden; font-family: "Barlow", sans-serif; }
+  .plate { position: absolute; inset: 0; width: 1200px; height: 628px; }
+  .logo { position: absolute; left: 56px; top: 40px; width: 150px; height: auto; }
+  .eyebrow { position: absolute; left: 56px; top: 132px; width: 560px;
+    font-weight: 600; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: #F26B21; }
+  .headline { position: absolute; left: 56px; top: 160px; width: 600px;
+    font-weight: 700; font-size: 40px; line-height: 1.1; color: #16202B; }
+  .subhead { position: absolute; left: 56px; top: 302px; width: 560px;
+    font-weight: 400; font-size: 15px; line-height: 1.5; color: #2E3B45; }
+  .cta { position: absolute; left: 56px; top: 366px; display: inline-flex; align-items: center;
+    padding: 12px 24px; border-radius: 4px;
+    font-weight: 600; font-size: 15px; color: #FFFFFF; background: #F26B21; }
+</style>
+</head>
+<body>
+  <div class="canvas">
+    <img class="plate" src="plate_real.png" />
+    <img class="logo" data-cq-role="logo"
+         src="file:///C:/Users/adiks/OneDrive/Documents/characterquilt-work-trial/characterquilt-work-trial/design-brains/design-brains/kahua/brand/kahua-logo.svg" />
+    <div class="eyebrow" data-cq-role="text">Field to Office</div>
+    <div class="headline" data-cq-role="text">Track every RFI before it becomes a change order</div>
+    <div class="subhead" data-cq-role="text">Kahua keeps RFIs, submittals and change orders on one timeline your whole team can see.</div>
+    <div class="cta" data-cq-role="cta">See how it works</div>
+  </div>
+</body>
+</html>
