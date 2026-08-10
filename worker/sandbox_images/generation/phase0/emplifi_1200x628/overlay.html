@@ -2,7 +2,14 @@
 <!-- Same campaign/copy as emplifi_1080x1080 (one request, multiple canvases).
      Layout is its own judgment call for this aspect ratio, not a resize of
      the square version - compact vertical stack to fit a 628px-tall frame,
-     positioned in the plate's actual left-two-thirds quiet zone. -->
+     positioned in the plate's actual left-two-thirds quiet zone.
+
+     CORRECTED (2026-08-10): this file originally scaled the headline/subhead
+     down (40px/15px) to make them fit the shorter frame, deviating from
+     DESIGN.md's stated type scale (h1:48px, body:16px) with no rule
+     permitting that. Found during a full audit and fixed - sizes are locked
+     to DESIGN.md now, only the vertical positions were adjusted to fit the
+     larger headline within the frame. -->
 <html>
 <head>
 <style>
@@ -18,13 +25,13 @@
   .logo { position: absolute; left: 56px; top: 40px; width: 140px; height: auto; }
   .eyebrow { position: absolute; left: 56px; top: 116px; width: 600px;
     font-weight: 600; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: #6765FE; }
-  .headline { position: absolute; left: 56px; top: 144px; width: 620px;
-    font-weight: 700; font-size: 40px; line-height: 1.12; color: #FFFFFF; }
-  .subhead { position: absolute; left: 56px; top: 292px; width: 560px;
-    font-weight: 400; font-size: 15px; line-height: 1.5; color: #94A9B8; }
-  .cta { position: absolute; left: 56px; top: 358px; display: inline-flex; align-items: center;
+  .headline { position: absolute; left: 56px; top: 132px; width: 620px;
+    font-weight: 700; font-size: 48px; line-height: 1.12; color: #FFFFFF; }
+  .subhead { position: absolute; left: 56px; top: 366px; width: 560px;
+    font-weight: 400; font-size: 16px; line-height: 1.5; color: #94A9B8; }
+  .cta { position: absolute; left: 56px; top: 432px; display: inline-flex; align-items: center;
     padding: 12px 24px; border: 2px solid #FF5A21; border-radius: 999px;
-    font-weight: 700; font-size: 15px; color: #FF5A21; background: transparent; }
+    font-weight: 700; font-size: 16px; color: #FF5A21; background: transparent; }
 </style>
 </head>
 <body>

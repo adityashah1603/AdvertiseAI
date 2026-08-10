@@ -12,7 +12,27 @@
      a variable photograph. Darkened toward ink here (#2E3B45) to stay
      legible while still reading as secondary to the headline. This is a
      per-render judgment call, not a token change - DESIGN.md's muted value
-     is untouched, this is a documented photographic-ground exception. -->
+     is untouched, this is a documented photographic-ground exception.
+
+     CORRECTED (2026-08-10), found during a full audit: this file also used
+     13px/40px/15px for eyebrow/headline/subhead - wrong on all three, and
+     the headline one is worse than a stray number: DESIGN.md's "Applying
+     it" section says explicitly, in these words, "An h1 is 48px on every
+     canvas. If the headline does not fit at 48, cut the copy; do not scale
+     the type." Scaling it to 40px to make it fit directly contradicts that
+     instruction. Separately: DESIGN.md's own "Type scale" table lists
+     "h1: 56px", which disagrees with the "Applying it" prose's 48px - a
+     genuine self-contradiction inside this one file, not a case of an
+     external cache disagreeing with DESIGN.md. Resolved in favor of the
+     "Applying it" value (48px): it's the more specific, operational
+     instruction (it comes with explicit fallback behavior - cut copy,
+     don't scale - which only makes sense if 48 is the real constraint),
+     whereas the table's 56 reads like a stale/unreviewed figure, the same
+     failure mode already seen in Emplifi's tokens.json. Fixed
+     eyebrow/subhead to the table's caption/body values (14px/17px, not
+     contradicted by any prose), fixed headline to 48px, and repositioned
+     everything to fit without overlap - copy was not cut because 48px did
+     fit once positions were adjusted. -->
 <html>
 <head>
 <style>
@@ -26,15 +46,15 @@
   .canvas { position: relative; width: 1200px; height: 628px; overflow: hidden; font-family: "Barlow", sans-serif; }
   .plate { position: absolute; inset: 0; width: 1200px; height: 628px; }
   .logo { position: absolute; left: 56px; top: 40px; width: 150px; height: auto; }
-  .eyebrow { position: absolute; left: 56px; top: 132px; width: 560px;
-    font-weight: 600; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: #F26B21; }
-  .headline { position: absolute; left: 56px; top: 160px; width: 600px;
-    font-weight: 700; font-size: 40px; line-height: 1.1; color: #16202B; }
-  .subhead { position: absolute; left: 56px; top: 302px; width: 560px;
-    font-weight: 400; font-size: 15px; line-height: 1.5; color: #2E3B45; }
-  .cta { position: absolute; left: 56px; top: 366px; display: inline-flex; align-items: center;
+  .eyebrow { position: absolute; left: 56px; top: 128px; width: 560px;
+    font-weight: 600; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: #F26B21; }
+  .headline { position: absolute; left: 56px; top: 156px; width: 600px;
+    font-weight: 700; font-size: 48px; line-height: 1.08; color: #16202B; }
+  .subhead { position: absolute; left: 56px; top: 380px; width: 560px;
+    font-weight: 400; font-size: 17px; line-height: 1.5; color: #2E3B45; }
+  .cta { position: absolute; left: 56px; top: 448px; display: inline-flex; align-items: center;
     padding: 12px 24px; border-radius: 4px;
-    font-weight: 600; font-size: 15px; color: #FFFFFF; background: #F26B21; }
+    font-weight: 600; font-size: 17px; color: #FFFFFF; background: #F26B21; }
 </style>
 </head>
 <body>

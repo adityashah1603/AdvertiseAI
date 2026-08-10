@@ -151,9 +151,66 @@ deliberately excluded as an unlicensable trademark, not because the
 pipeline failed to use them. Worth stating plainly rather than letting the
 render's quality imply more brand-fidelity than is honestly there.
 
+## Full type-scale compliance audit (2026-08-10)
+
+Prompted by a direct question ("are you using the elements from
+design-brain?"), did a from-scratch audit of every real render against its
+brand's exact stated numbers (palette hex, type scale, radius, CTA rules) -
+not a spot check, every eyebrow/headline/subhead/CTA in every file, read in
+full rather than grepped in fragments. Found real violations:
+
+- **`emplifi_1200x628`**: eyebrow/headline/subhead were 13/40/15px against a
+  stated 13/48/16px - headline and subhead wrong, no rule permitted the
+  deviation. Fixed and re-rendered; 48px headline fits the 628px frame
+  cleanly once repositioned.
+- **`emplifi_1080x1350`**: 14/52/17px against 13/48/16px - all three wrong,
+  and this canvas had the *most* free space of the three, so there wasn't
+  even a fit pressure excuse. Fixed and re-rendered.
+- **`kahua_1200x628`**: 13/40/15px against a resolved 14/48/17px (see below)
+  - the headline one is the serious case: Kahua's `DESIGN.md` states, in
+    these words, *"An h1 is 48px on every canvas. If the headline does not
+    fit at 48, cut the copy; do not scale the type."* Using 40px directly
+    contradicted an explicit instruction, not just a table value. Fixed and
+    re-rendered; 48px fits in two lines with no overlap, so copy did not
+    need cutting.
+- **`duolingo_1080x1080`**: eyebrow/subhead were 15/18px against this
+  brain's own stated 13/16px. Same mistake pattern, different brand. Fixed
+  and re-rendered.
+- **`kahua_1080x1080`** and **`kahua_1080x1350`**: audited clean - the
+  square version already matched every rule (including having the 48px
+  rule quoted in its own code comment), and the portrait version's numbers
+  were already correct; only added a missing documentation comment for an
+  existing, already-correct color choice.
+
+**New finding surfaced while resolving the Kahua violation: `DESIGN.md`
+self-contradicts, not just disagrees with an external cache.** Its "Type
+scale" table states `h1: 56px`; its "Applying it" prose states *"An h1 is
+48px on every canvas... do not scale the type."* Two sections of the same
+source-of-truth file disagree with each other - a different failure mode
+than Emplifi's DESIGN.md-vs-tokens.json drift, which was cross-file.
+Resolved in favor of the prose value (48px): it's the more specific,
+operational instruction - it comes with explicit fallback behavior ("cut
+the copy") that only makes sense if 48 is the real constraint - while the
+table's 56 reads like the same kind of stale, unreviewed figure Emplifi's
+tokens.json turned out to be. Applying it consistently, not cherry-picked
+per canvas.
+
+**Root cause, stated plainly:** when building the landscape/portrait
+versions of each brand, sizes were adjusted by eye for vertical fit instead
+of being re-derived from each brand's actual type scale every time, and in
+a few cases values were seemingly cross-contaminated between the two
+brands' scales (13 vs 14 caption, 16 vs 17 body). The fix going forward
+(relevant once this becomes real agent behavior in Step 3, not just my own
+manual process): resolve to a canvas's font sizes from `DESIGN.md` first,
+then solve the fit problem via positioning/line-count/copy-cutting - never
+by treating the type scale as a suggestion.
+
 ## Next
 
 1. Resolve the 728x90 question with the CEO before spending more on it.
 2. Get a second, independent look at all six real renders before calling
    Step 1's "20 ads per brand you'd defend" bar met - one pass of self-review
-   during building is not the same as a cold review after.
+   during building is not the same as a cold review after. This audit is a
+   good example of why: the type-scale violations survived one full "look
+   at it" pass each and were only caught by a targeted second pass against
+   the source document, not by general visual review.

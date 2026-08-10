@@ -8,7 +8,19 @@
      the standard dark-ink kahua-logo.svg. Copy sits on the bottom concrete
      zone in white, since that ground reads medium-dark, not light - the
      opposite color choice from the square/landscape versions, made because
-     this render's actual tones are opposite theirs, not by default. -->
+     this render's actual tones are opposite theirs, not by default.
+
+     FINDING, documented on audit (2026-08-10, should have been called out
+     when this file was first built): the subhead here uses #E4E8EC, not
+     DESIGN.md's literal muted token (#6B7A88) - same underlying reason as
+     kahua_1200x628's documented exception (muted assumes a flat/light
+     surface; on this dark concrete ground, #6B7A88 would be nearly as
+     illegible as it was there). A light off-white keeps the subhead
+     reading as secondary to the white headline while staying legible on a
+     dark photograph. Confirmed audit found no numeric type-scale
+     violations in this file (eyebrow 14px, headline 48px, subhead 17px all
+     already matched DESIGN.md) - this comment only adds documentation for
+     an existing color choice, the rendered output is unchanged. -->
 <html>
 <head>
 <style>

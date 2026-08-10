@@ -2,7 +2,14 @@
 <!-- Same campaign/copy as emplifi_1080x1080. This plate's quiet zone is huge
      (almost the entire top two-thirds), so this layout can afford more
      generous vertical whitespace than the landscape version - a genuinely
-     different composition, not a stretch of either other size. -->
+     different composition, not a stretch of either other size.
+
+     CORRECTED (2026-08-10): this file originally used 14px/52px/17px for
+     eyebrow/headline/subhead, deviating from DESIGN.md's actual values
+     (13px/48px/16px) with no rule permitting it - found during a full
+     audit. There was no space constraint forcing this (this canvas has the
+     most free room of the three), so it was simply wrong. Fixed to the
+     exact DESIGN.md values. -->
 <html>
 <head>
 <style>
@@ -17,14 +24,14 @@
   .plate { position: absolute; inset: 0; width: 1080px; height: 1350px; }
   .logo { position: absolute; left: 64px; top: 72px; width: 170px; height: auto; }
   .eyebrow { position: absolute; left: 64px; top: 260px; width: 700px;
-    font-weight: 600; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: #6765FE; }
-  .headline { position: absolute; left: 64px; top: 292px; width: 780px;
-    font-weight: 700; font-size: 52px; line-height: 1.14; color: #FFFFFF; }
-  .subhead { position: absolute; left: 64px; top: 560px; width: 660px;
-    font-weight: 400; font-size: 17px; line-height: 1.55; color: #94A9B8; }
-  .cta { position: absolute; left: 64px; top: 636px; display: inline-flex; align-items: center;
+    font-weight: 600; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: #6765FE; }
+  .headline { position: absolute; left: 64px; top: 288px; width: 780px;
+    font-weight: 700; font-size: 48px; line-height: 1.14; color: #FFFFFF; }
+  .subhead { position: absolute; left: 64px; top: 552px; width: 660px;
+    font-weight: 400; font-size: 16px; line-height: 1.55; color: #94A9B8; }
+  .cta { position: absolute; left: 64px; top: 626px; display: inline-flex; align-items: center;
     padding: 15px 30px; border: 2px solid #FF5A21; border-radius: 999px;
-    font-weight: 700; font-size: 17px; color: #FF5A21; background: transparent; }
+    font-weight: 700; font-size: 16px; color: #FF5A21; background: transparent; }
 </style>
 </head>
 <body>
