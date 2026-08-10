@@ -1,0 +1,27 @@
+{
+  "request_id": "req_7Q2M4X",
+  "kind": "new",
+  "submitted_at": "2026-08-11T09:14:02Z",
+  "submitted_by": "operator@emplifi.example",
+  "customer": "emplifi",
+  "brand_kit_id": "bk-emplifi-2026",
+  "campaign": "2026 Social Commerce Predictions",
+  "canvases": [
+    { "name": "square", "width": 1080, "height": 1080 },
+    { "name": "landscape", "width": 1200, "height": 628 },
+    { "name": "portrait", "width": 1080, "height": 1350 },
+    { "name": "leaderboard", "width": 728, "height": 90 }
+  ],
+  "copy": {
+    "eyebrow": "2026 Predictions",
+    "headline": "Shoppable video becomes the default discovery surface",
+    "subhead": "TikTok Shop now hosts 500,000+ US sellers. Your feed is a storefront.",
+    "cta": "Get the predictions",
+    "cta_href": "https://emplifi.example/predictions-2026",
+    "legal": null
+  },
+  "inspirations": [
+    "emplifi-predictions-square.png"
+  ],
+  "notes": "Leadership wants this to sit next to last year's predictions set."
+}

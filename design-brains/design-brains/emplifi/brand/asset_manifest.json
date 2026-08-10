@@ -1,0 +1,27 @@
+{
+  "brand_kit_id": "bk-emplifi-2026",
+  "assets": [
+    {
+      "kind": "logo",
+      "path": "brand/emplifi-logo.svg",
+      "brand_kit_id": "bk-emplifi-2026"
+    },
+    {
+      "kind": "logo_reverse",
+      "path": "brand/emplifi-logo-white.svg",
+      "brand_kit_id": "bk-emplifi-2026",
+      "notes": "For placement on the navy ground and on photography."
+    },
+    {
+      "kind": "logo_mark",
+      "path": "brand/emplifi-mark.svg",
+      "brand_kit_id": "bk-emplifi-2026"
+    },
+    {
+      "kind": "logo_lockup",
+      "path": "brand/partner-lockup.svg",
+      "brand_kit_id": "bk-kahua-2026",
+      "notes": "Co-marketing lockup, reverse. Staged 2026-03-11."
+    }
+  ]
+}

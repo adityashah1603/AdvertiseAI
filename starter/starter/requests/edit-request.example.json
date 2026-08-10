@@ -1,0 +1,44 @@
+{
+  "request_id": "req_B8H1TZ",
+  "kind": "edit",
+  "submitted_at": "2026-08-11T16:47:35Z",
+  "submitted_by": "operator@kahua.example",
+  "customer": "kahua",
+  "brand_kit_id": "bk-kahua-2026",
+  "campaign": "Federal Portfolio ABM",
+  "edits": {
+    "of_request_id": "req_5K9DPW",
+    "of_revision": 3,
+    "canvases": [
+      { "name": "portrait", "width": 1080, "height": 1350 }
+    ]
+  },
+  "copy": {
+    "eyebrow": "Case Study",
+    "headline": "$50B+ in federal assets managed on Kahua",
+    "subhead": "GSA standardized on Kahua for its national portfolio.",
+    "cta": "See the federal brief",
+    "cta_href": "https://kahua.example/federal-brief",
+    "legal": null
+  },
+  "inspirations": [],
+  "comments": [
+    {
+      "comment_id": "cm_01",
+      "author": "operator@kahua.example",
+      "created_at": "2026-08-11T16:44:10Z",
+      "on_canvas": "portrait",
+      "region": { "x": 78, "y": 640, "width": 604, "height": 214 },
+      "body": "This is unreadable where it sits. The sky behind it is doing too much."
+    },
+    {
+      "comment_id": "cm_02",
+      "author": "operator@kahua.example",
+      "created_at": "2026-08-11T16:46:51Z",
+      "on_canvas": "portrait",
+      "region": { "x": 64, "y": 1188, "width": 288, "height": 92 },
+      "body": "Wrong colour, and it should read as the only thing to click."
+    }
+  ],
+  "notes": "Same headline, same photo direction. Fix the two pins and nothing else."
+}

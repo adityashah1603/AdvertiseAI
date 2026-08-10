@@ -1,0 +1,21 @@
+{
+  "brand_kit_id": "bk-kahua-2026",
+  "assets": [
+    {
+      "kind": "logo",
+      "path": "brand/kahua-logo.svg",
+      "brand_kit_id": "bk-kahua-2026"
+    },
+    {
+      "kind": "logo_reverse",
+      "path": "brand/kahua-logo-white.svg",
+      "brand_kit_id": "bk-kahua-2026",
+      "notes": "For placement on photography and any ground darker than #6B7A88."
+    },
+    {
+      "kind": "logo_mark",
+      "path": "brand/kahua-mark.svg",
+      "brand_kit_id": "bk-kahua-2026"
+    }
+  ]
+}
