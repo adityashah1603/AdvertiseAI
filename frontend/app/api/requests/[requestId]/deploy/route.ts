@@ -9,6 +9,13 @@ import type { RequestRow, Revision } from "@/lib/types";
 // rendered. runs.revision_number here names WHICH existing revision to
 // deploy, not one to be created, and no new `revisions` row is inserted.
 //
+// BUG FIX: a deploy is scoped to exactly ONE canvas, named explicitly by
+// the caller - canvas_name is required in the body and validated against
+// this revision's own assets. Previously this route (and hydrate_deploy())
+// had no notion of "which canvas" at all, so the agent had to guess -
+// observed to inconsistently deploy whichever one it happened to pick,
+// never necessarily the one the operator was actually looking at.
+//
 // This handler never touches E2B/Anthropic/Adstream - it only writes one
 // Postgres row. The already-running dispatcher (worker/orchestrator/
 // dispatcher.py --serve) claims it via claim_next_deploy_run() and executes
@@ -19,6 +26,11 @@ export async function POST(
   { params }: { params: Promise<{ requestId: string }> }
 ) {
   const { requestId } = await params;
+  const body = await req.json().catch(() => null);
+  const canvasName = body?.canvas_name as string | undefined;
+  if (!canvasName) {
+    return NextResponse.json({ error: "canvas_name is required - which canvas should be deployed?" }, { status: 400 });
+  }
 
   const client = getServerSupabase();
 
@@ -46,6 +58,20 @@ export async function POST(
     );
   }
 
+  const { data: asset, error: assetErr } = await client
+    .from("assets")
+    .select("canvas_name")
+    .eq("revision_id", latest.id)
+    .eq("canvas_name", canvasName)
+    .maybeSingle();
+  if (assetErr) return NextResponse.json({ error: assetErr.message }, { status: 500 });
+  if (!asset) {
+    return NextResponse.json(
+      { error: `canvas '${canvasName}' has no rendered asset on the current revision` },
+      { status: 400 }
+    );
+  }
+
   const { data: run, error: runErr } = await client
     .from("runs")
     .insert({
@@ -53,6 +79,7 @@ export async function POST(
       tenant_id: (request as RequestRow).tenant_id,
       request_id: requestId,
       revision_number: latest.revision_number,
+      canvas_name: canvasName,
       status: "queued",
       reason: "ui-deploy",
     })
@@ -63,7 +90,7 @@ export async function POST(
   }
 
   return NextResponse.json(
-    { revision_number: latest.revision_number, run_id: run.id },
+    { revision_number: latest.revision_number, canvas_name: canvasName, run_id: run.id },
     { status: 201 }
   );
 }

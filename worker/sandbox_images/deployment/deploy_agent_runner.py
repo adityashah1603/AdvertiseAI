@@ -15,9 +15,13 @@ would couple the two images together.
 Expects to run with its working directory set to the root of a hydrated
 file tree (see worker/hydration/deployment.py +
 worker/orchestrator/upload_urls.py):
-  job/request.json              - campaign, copy, canvas list
-  job/creative/<name>.png       - this revision's final rendered PNGs,
-                                   the only "creative" this agent ever sees
+  job/request.json              - campaign, copy, the ONE canvas being deployed
+  job/creative/<name>.png       - that one canvas's final rendered PNG,
+                                   the only "creative" this agent ever sees -
+                                   one canvas per deploy run, chosen by the
+                                   operator, never a set for the agent to
+                                   choose among (Adstream only accepts one
+                                   image per ad anyway)
   job/upload_urls.json          - {relative_output_path: signed_upload_url},
                                    minted by the orchestrator BEFORE this
                                    sandbox existed - this sandbox never sees
@@ -118,9 +122,12 @@ memory of clicking "Publish."
 Your working directory already contains:
   job/request.json        - campaign name and copy (for the ad name /
                              destination URL - see below for what to do if
-                             a field is blank)
-  job/creative/*.png       - the final rendered creative(s) to upload,
-                             one file per canvas size
+                             a field is blank), plus the one canvas you're
+                             deploying (name + dimensions)
+  job/creative/<name>.png  - that one canvas's final rendered creative to
+                             upload - exactly one file, exactly one ad to
+                             create. The operator picked this canvas
+                             specifically; do not look for others.
 
 Adstream:
   URL:   {login_url or '(ADSTREAM_LOGIN_URL not set)'}
@@ -156,8 +163,8 @@ Non-negotiable order of operations:
      "Recording" section below. A run that ends without a real recording
      uploaded is a FAILED run, full stop, regardless of what the browser
      did on screen. This is the brief's own rule, not a suggestion.
-  2. Sign in, complete the create flow, upload the creative (use the
-     job/creative/*.png file(s) directly), publish.
+  2. Sign in, complete the create flow, upload the creative (the one
+     job/creative/<name>.png file directly), publish.
   3. Navigate to the ad's own detail page. Read back, from that page:
      the ad name as actually stored (post-normalization) and its publish
      status. This read-back is what "verified" means - you may not set
@@ -204,7 +211,7 @@ without it.
 
 
 def build_task_prompt(job: dict) -> str:
-    creative_names = ", ".join(f"job/creative/{c['name']}.png" for c in job["canvases"])
+    canvas = job["canvas"]
     return f"""Deploy this ad to Adstream.
 
 Campaign: {job['campaign']}
@@ -212,7 +219,11 @@ Copy (for the ad name / destination URL - see your system prompt for what to
 do if a field below is blank):
 {json.dumps(job['copy'], indent=2)}
 
-Creative file(s) to upload: {creative_names}
+Creative file to upload: job/creative/{canvas['name']}.png ({canvas['width']}x{canvas['height']})
+
+This is the ONLY creative for this deploy - the operator chose this one
+canvas specifically. Create exactly one ad using exactly this file. Do not
+look for or invent other canvases.
 
 Follow the order of operations in your system prompt exactly: start
 recording first, sign in, create, upload, publish, read the detail page

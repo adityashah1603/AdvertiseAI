@@ -1,7 +1,7 @@
 // Mirrors supabase/migrations/0001_init.sql + 0004_comments.sql +
-// 0007_inspirations_bucket.sql + 0008_deploys.sql exactly - this file has
-// no independent opinion about the schema, it just names it for the
-// TypeScript side.
+// 0007_inspirations_bucket.sql + 0008_deploys.sql + 0010_deploy_canvas_name.sql
+// exactly - this file has no independent opinion about the schema, it just
+// names it for the TypeScript side.
 
 export type Tenant = {
   id: string;
@@ -66,6 +66,10 @@ export type Run = {
   request_id: string;
   revision_id: string | null;
   revision_number: number | null;
+  // Only ever set for type: "deploy" - which canvas this run was asked to
+  // publish. Adstream only accepts one image per ad, so a deploy is always
+  // scoped to exactly one canvas, never a set the agent picks among.
+  canvas_name: string | null;
   status: RunStatus;
   sandbox_id: string | null;
   error_message: string | null;
@@ -110,6 +114,7 @@ export type Deploy = {
   id: string;
   revision_id: string;
   run_id: string;
+  canvas_name: string | null;
   adstream_ad_name: string | null;
   adstream_url: string | null;
   // Only ever true once execute_deploy_run.py has confirmed BOTH the

@@ -212,10 +212,15 @@ export default function RequestDetailPage() {
   }
 
   async function submitDeploy() {
+    if (!selectedCanvas) return;
     setDeploySubmitting(true);
     setDeployError(null);
     try {
-      const res = await fetch(`/api/requests/${requestId}/deploy`, { method: "POST" });
+      const res = await fetch(`/api/requests/${requestId}/deploy`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ canvas_name: selectedCanvas }),
+      });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "deploy failed");
       const refreshed = await fetch(`/api/requests/${requestId}`, { cache: "no-store" });
@@ -383,17 +388,25 @@ export default function RequestDetailPage() {
             <p className="muted">Wait for the current revision to finish before deploying.</p>
           ) : (
             <>
-              <button onClick={submitDeploy} disabled={deploySubmitting || deployInFlight}>
+              {/* deployRun/deploy reflect the request's MOST RECENT deploy attempt,
+                  which may have been for a different canvas than the one currently
+                  selected below - the button always deploys selectedCanvas specifically,
+                  and "again" only applies when the most recent attempt was for this
+                  same canvas, so it's never ambiguous which one you're about to fire. */}
+              <button onClick={submitDeploy} disabled={deploySubmitting || deployInFlight || !selectedCanvas}>
                 {deployInFlight
-                  ? "Deploying…"
-                  : deploy
-                  ? "Deploy again"
-                  : "Deploy to Adstream"}
+                  ? `Deploying ${deployRun?.canvas_name ?? "…"}`
+                  : deploy && deploy.canvas_name === selectedCanvas
+                  ? `Deploy ${selectedCanvas} again`
+                  : `Deploy ${selectedCanvas ?? "…"}`}
               </button>
               {deployError && <p className="error" style={{ marginTop: "0.5rem" }}>{deployError}</p>}
 
               {deployRun && (
                 <div style={{ marginTop: "0.75rem" }}>
+                  <p className="muted mono" style={{ marginBottom: "0.25rem", fontSize: "0.8rem" }}>
+                    last deploy attempt: {deployRun.canvas_name ?? "(unknown canvas)"}
+                  </p>
                   <span className={`status-pill status-${deployRun.status}`}>{deployRun.status}</span>
                   {deployRun.status === "failed" && deployRun.error_message && (
                     <p className="error" style={{ marginTop: "0.5rem" }}>{deployRun.error_message}</p>

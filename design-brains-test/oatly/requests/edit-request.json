@@ -1,0 +1,19 @@
+{
+  "kind": "edit",
+  "tenant_slug": "oatly",
+  "campaign": "Barista Blend Launch",
+  "comments": [
+    {
+      "canvas_name": "square",
+      "region": { "x": 140, "y": 860, "width": 280, "height": 100 },
+      "body": "The CTA stamp is sitting dead level - this brand's stamp always sits a few degrees off-grid, like it was actually pressed by hand. Rotate it, and keep the red inside the stamp shape only, never as the pill fill behind it.",
+      "author": "operator@oatly.example"
+    },
+    {
+      "canvas_name": "landscape",
+      "region": { "x": 70, "y": 300, "width": 520, "height": 70 },
+      "body": "Subhead reads like a straight product spec - give it back some of the headline's attitude, one dry joke, still short.",
+      "author": "operator@oatly.example"
+    }
+  ]
+}

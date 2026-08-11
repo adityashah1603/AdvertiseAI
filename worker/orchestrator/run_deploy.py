@@ -11,7 +11,7 @@ but this file stays useful for the same one-off "just run this and watch"
 testing run_generation.py already serves for generation.
 
 Usage:
-    python run_deploy.py <tenant_id> <request_id> <revision_number>
+    python run_deploy.py <tenant_id> <request_id> <revision_number> <canvas_name>
 """
 import os
 import sys
@@ -27,7 +27,7 @@ from onboarding import get_client  # noqa: E402
 from execute_deploy_run import execute_claimed_deploy_run  # noqa: E402
 
 
-def run_deploy(tenant_id, request_id, revision_number):
+def run_deploy(tenant_id, request_id, revision_number, canvas_name):
     client = get_client()
 
     print("1. Recording the deploy run's existence before anything else happens...")
@@ -37,18 +37,19 @@ def run_deploy(tenant_id, request_id, revision_number):
         "tenant_id": tenant_id,
         "request_id": request_id,
         "revision_number": revision_number,
+        "canvas_name": canvas_name,
         "status": "running",
         "started_at": started_at,
         "reason": "manual",
     }).execute().data[0]
-    print(f"   run_id: {run['id']}")
+    print(f"   run_id: {run['id']}  canvas: {canvas_name}")
 
     print("\n2-8. Hydrating, sandboxing, driving Adstream, verifying, updating status...")
     return execute_claimed_deploy_run(run)
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print("Usage: python run_deploy.py <tenant_id> <request_id> <revision_number>")
+    if len(sys.argv) != 5:
+        print("Usage: python run_deploy.py <tenant_id> <request_id> <revision_number> <canvas_name>")
         sys.exit(1)
-    run_deploy(sys.argv[1], sys.argv[2], int(sys.argv[3]))
+    run_deploy(sys.argv[1], sys.argv[2], int(sys.argv[3]), sys.argv[4])

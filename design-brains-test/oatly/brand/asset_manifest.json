@@ -1,0 +1,23 @@
+{
+  "brand_kit_id": "bk-oatly-test-2026",
+  "assets": [
+    {
+      "kind": "logo",
+      "path": "brand/oatly-logo.svg",
+      "brand_kit_id": "bk-oatly-test-2026",
+      "notes": "Original placeholder wordmark - not Oatly's real trademark. See DESIGN.md Provenance."
+    },
+    {
+      "kind": "logo_reverse",
+      "path": "brand/oatly-logo-white.svg",
+      "brand_kit_id": "bk-oatly-test-2026",
+      "notes": "For placement on the ink ground and on scribble-field art."
+    },
+    {
+      "kind": "logo_mark",
+      "path": "brand/oatly-mark.svg",
+      "brand_kit_id": "bk-oatly-test-2026",
+      "notes": "Original placeholder mark - not Oatly's real trademark. See DESIGN.md Provenance."
+    }
+  ]
+}

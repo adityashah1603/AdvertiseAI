@@ -44,6 +44,7 @@ def execute_claimed_deploy_run(run):
     tenant_id = run["tenant_id"]
     request_id = run["request_id"]
     revision_number = run["revision_number"]
+    canvas_name = run["canvas_name"]
     reason = run.get("reason") or "initial"
 
     def log(msg):
@@ -91,8 +92,14 @@ def execute_claimed_deploy_run(run):
         except Exception as e:  # noqa: BLE001 - audit trail, never worth failing the run over
             log(f"attempt log write failed (non-fatal): {e}")
 
-        log("hydrating (this revision's final creative only - no brand-kit, no OpenAI key)...")
-        files = hydrate_deploy(tenant_id, request_id, revision_number)
+        if not canvas_name:
+            raise ValueError(
+                f"run {run_id} has no canvas_name set - deploy runs must name exactly one canvas "
+                f"(see supabase/migrations/0010_deploy_canvas_name.sql)."
+            )
+
+        log(f"hydrating canvas '{canvas_name}' only - no brand-kit, no OpenAI key...")
+        files = hydrate_deploy(tenant_id, request_id, revision_number, canvas_name)
         log(f"{len(files)} files")
 
         log("minting signed upload URLs for deploy outputs (recording.webm, RESULT.json, ...)...")
@@ -222,6 +229,7 @@ def execute_claimed_deploy_run(run):
         client.table("deploys").insert({
             "revision_id": revision_id,
             "run_id": run_id,
+            "canvas_name": canvas_name,
             "adstream_ad_name": (deploy_result or {}).get("adstream_ad_name"),
             "adstream_url": (deploy_result or {}).get("adstream_url"),
             # verified is only ever true if BOTH the agent's own RESULT.json

@@ -1,0 +1,20 @@
+{
+  "kind": "new",
+  "tenant_slug": "oatly",
+  "campaign": "Barista Blend Launch",
+  "copy": {
+    "eyebrow": "New Carton, Who Dis",
+    "headline": "Dairy called. We let it go to voicemail.",
+    "subhead": "100% oat, 0% cow, all foam - built for your flat white.",
+    "cta": "Find it near you",
+    "cta_href": "https://oatly.example/barista-blend",
+    "legal": null
+  },
+  "canvases": [
+    { "name": "square", "width": 1080, "height": 1080 },
+    { "name": "landscape", "width": 1200, "height": 628 },
+    { "name": "portrait", "width": 1080, "height": 1350 },
+    { "name": "story", "width": 1080, "height": 1920 }
+  ],
+  "inspirations": []
+}
