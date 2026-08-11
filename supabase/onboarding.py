@@ -14,11 +14,22 @@ What onboarding a tenant means, concretely:
   1. Insert a `tenants` row (idempotent by slug - re-onboarding an existing
      slug reuses its id/buckets rather than duplicating).
   2. Create two Storage buckets scoped to this tenant alone:
-     brand-kit-{tenant_id} and jobs-{tenant_id}. Per-tenant buckets, not a
-     shared bucket with a tenant_id-prefixed path - see DECISIONS.md for
-     the reasoning (a bug in one tenant's bucket setup stays contained to
-     that bucket, rather than one shared policy protecting everyone at
-     once).
+     brandkit-{slug}-{short_id} and jobs-{slug}-{short_id}. Per-tenant
+     buckets, not a shared bucket with a tenant_id-prefixed path - see
+     DECISIONS.md for the reasoning (a bug in one tenant's bucket setup
+     stays contained to that bucket, rather than one shared policy
+     protecting everyone at once). Named with the tenant's own slug (not
+     just a bare UUID) so a human scanning the Storage dashboard can tell
+     whose data a bucket holds without cross-referencing the `tenants`
+     table - the {short_id} suffix (the tenant id's own first 8 hex
+     characters) exists only for guaranteed uniqueness if a slug were ever
+     reused, never for lookup: every place that actually NEEDS a bucket
+     name reads it from `tenants.brand_kit_bucket`/`jobs_bucket`, never
+     reconstructs it from the slug. This is cosmetic/organizational, not a
+     sandbox-identity concern - ROADMAP.md's "no tenant-specific identity"
+     disqualifier is explicitly about a SANDBOX's image/template/name/id,
+     not about how tenant-scoped Storage buckets (already tenant-specific
+     by design) happen to be labeled.
   3. If brand-kit files are given, upload them into the brand-kit bucket -
      at the bucket root now, not under a tenant_id prefix, since the
      bucket itself is the isolation boundary.
@@ -86,8 +97,9 @@ def onboard_tenant(client, slug, name, local_brand_kit_dir=None):
     else:
         result = client.table("tenants").insert({"slug": slug, "name": name}).execute()
         tenant_id = result.data[0]["id"]
-        brand_kit_bucket = f"brand-kit-{tenant_id}"
-        jobs_bucket = f"jobs-{tenant_id}"
+        short_id = tenant_id.split("-")[0]  # UUID's own first 8 hex chars - no new id invented
+        brand_kit_bucket = f"brandkit-{slug}-{short_id}"
+        jobs_bucket = f"jobs-{slug}-{short_id}"
 
         client.storage.create_bucket(brand_kit_bucket, options={"public": False})
         client.storage.create_bucket(jobs_bucket, options={"public": False})

@@ -22,10 +22,15 @@ required anywhere (ROADMAP.md SS6).
 NOT yet implemented: fetching actual inspiration image files (the
 `inspirations` list is passed through in job/request.json, but the
 referenced files aren't fetched - there's no inspirations bucket yet, and
-no request has needed one tested end-to-end). NOT yet implemented: prior
-revision's assets / open comments for an edit run (comments don't exist
-until Step 6). Both are called out explicitly rather than silently doing
-nothing.
+no request has needed one tested end-to-end). Called out explicitly rather
+than silently doing nothing.
+
+Edit runs (revision_number > 1): the prior revision's assets (plate/
+overlay/render per canvas) plus any `open` comments left on it are pulled
+in as job-tier data too - see `_hydrate_edit_context()`. Detected purely
+from whether revision_number - 1 exists and has a succeeded run, not from
+a `kind` flag threaded through by the caller - nothing about "is this an
+edit" is asserted from outside; it's derived from what's actually durable.
 """
 import json
 import os
@@ -38,6 +43,7 @@ load_dotenv(os.path.join(ROOT, ".env"))
 sys.path.insert(0, os.path.join(ROOT, "supabase"))
 
 from onboarding import get_client  # noqa: E402 - reuse the same client factory, not a new one
+from storage_paths import revision_prefix  # noqa: E402
 
 GENERATION_SKILL_FILES = {
     "skill/SKILL.md": os.path.join(ROOT, "SKILL.md"),
@@ -69,6 +75,93 @@ def _fetch_bucket_recursive(client, bucket, prefix=""):
         else:
             files[rel_path] = client.storage.from_(bucket).download(rel_path)
     return files
+
+
+def _hydrate_edit_context(client, tenant, request, revision_number):
+    """Returns (extra_files, job_context_additions) for revision_number > 1,
+    or ({}, {}) if revision_number == 1 (a first-time generation, not an
+    edit - nothing to pull forward).
+
+    Deliberately requires the PRIOR revision to have an actual succeeded
+    run before treating this as an editable edit - revisions.status is
+    never updated by execute_run.py (only runs.status is), so a completed
+    run is the only durable signal of "this revision's output really
+    exists." Refusing to hydrate an edit against a prior revision that
+    never finished is the same "loud, not silent" posture as the
+    tenant/request mismatch check above."""
+    if revision_number <= 1:
+        return {}, {}
+
+    prior_number = revision_number - 1
+    prior_revision = (
+        client.table("revisions")
+        .select("*")
+        .eq("request_id", request["id"])
+        .eq("revision_number", prior_number)
+        .single()
+        .execute()
+        .data
+    )
+
+    prior_run = (
+        client.table("runs")
+        .select("*")
+        .eq("request_id", request["id"])
+        .eq("revision_number", prior_number)
+        .eq("status", "succeeded")
+        .order("ended_at", desc=True)
+        .limit(1)
+        .execute()
+        .data
+    )
+    if not prior_run:
+        raise ValueError(
+            f"revision {revision_number} is an edit of revision {prior_number}, but "
+            f"revision {prior_number} has no succeeded run - refusing to hydrate an "
+            f"edit against output that doesn't durably exist."
+        )
+
+    bucket = tenant["jobs_bucket"]
+    prior_prefix = revision_prefix(request["campaign"], request["id"], prior_number)
+
+    extra_files = {}
+    for canvas in request["canvases"]:
+        name = canvas["name"]
+        for fname in ("plate.png", "overlay.html", "render.png"):
+            storage_path = f"{prior_prefix}/{name}/{fname}"
+            try:
+                data = client.storage.from_(bucket).download(storage_path)
+            except Exception as e:  # noqa: BLE001 - missing prior asset is a finding, not a crash
+                extra_files[f"job/prior_revision/{name}/{fname}.MISSING.txt"] = (
+                    f"Expected at {storage_path}, not found: {e}".encode("utf-8")
+                )
+                continue
+            extra_files[f"job/prior_revision/{name}/{fname}"] = data
+
+    open_comments = (
+        client.table("comments")
+        .select("*")
+        .eq("revision_id", prior_revision["id"])
+        .eq("status", "open")
+        .order("created_at")
+        .execute()
+        .data
+    )
+
+    job_additions = {
+        "is_edit": True,
+        "prior_revision_number": prior_number,
+        "comments": [
+            {
+                "canvas_name": c["canvas_name"],
+                "region": c["region"],
+                "body": c["body"],
+                "author": c["author"],
+            }
+            for c in open_comments
+        ],
+    }
+    return extra_files, job_additions
 
 
 def hydrate_generation(tenant_id, request_id, revision_number):
@@ -122,7 +215,13 @@ def hydrate_generation(tenant_id, request_id, revision_number):
         "copy": request["copy"],
         "canvases": request["canvases"],
         "inspirations": request["inspirations"],
+        "is_edit": False,
     }
+
+    edit_files, edit_job_additions = _hydrate_edit_context(client, tenant, request, revision_number)
+    files.update(edit_files)
+    job_context.update(edit_job_additions)
+
     files["job/request.json"] = json.dumps(job_context, indent=2).encode("utf-8")
 
     return files

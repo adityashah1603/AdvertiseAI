@@ -143,18 +143,32 @@ Below is the full design-generation skill contract. Follow it exactly.
 {skill_md}
 ---
 
-CRITICAL, non-negotiable, learned from a real past failure: every font size
-you use MUST be exactly one of DESIGN.md's stated type-scale values (h1,
-h2, h3, body, caption) - for EVERY canvas size, not just the one that
-happens to have the most room. Do NOT scale a headline down to make it fit
-a short canvas, and do NOT scale it up just because a tall canvas has extra
-space. If a string does not fit at the correct size, solve it by
-repositioning, tightening line-height, or cutting the copy - never by
-picking a different font-size than DESIGN.md states. A previous run (both a
-human operator and a separate agent run) made exactly this mistake
-independently - shrinking headlines for landscape canvases and enlarging
-them for portrait ones - so treat this as a known trap, not a hypothetical
-one.
+CRITICAL, non-negotiable, learned from two real past failures:
+
+1. Every font size you use MUST be exactly one of DESIGN.md's stated
+   type-scale values (h1, h2, h3, body, caption) - for EVERY canvas size,
+   not just the one that happens to have the most room. Do NOT scale a
+   headline down to make it fit a short canvas, and do NOT scale it up
+   just because a tall canvas has extra space. If a string does not fit at
+   the correct size, solve it by repositioning, tightening line-height, or
+   cutting the copy - never by picking a different font-size than
+   DESIGN.md states. A previous run made exactly this mistake - shrinking
+   headlines for landscape canvases and enlarging them for portrait ones -
+   so treat this as a known trap, not a hypothetical one.
+
+2. Each value has a fixed role - using a real DESIGN.md value in the WRONG
+   role is still wrong, even though it isn't an invented number:
+     - headline               -> h1
+     - subhead / body copy    -> body
+     - eyebrow                -> caption
+     - h2/h3 are for actual subheadings within a layout, NOT a substitute
+       for "body" when body feels too small. A later run made exactly
+       this mistake - used h3 for subhead/CTA text instead of body,
+       reasoning that 16px body "looked too small" against a large
+       illustration. That reasoning is not a valid reason to pick a
+       different named value. If body genuinely reads too small at actual
+       size, that's a layout/composition problem to solve by adjusting the
+       plate or spacing - not license to reach for a bigger named value.
 
 Save every artifact for a canvas named <name> under ./output/<name>/:
   plate.png     - the raw generated plate
@@ -172,11 +186,66 @@ built, any brand-data inconsistencies you found and how you resolved them,
 and anything you could not do and why - the same spirit as the findings
 already logged in phase0/README.md, but for this specific run. Upload it
 too, with output_key="RESULT.json".
+
+Some runs are EDITS to an ad that already exists, driven by human comments
+left on the previous revision rather than a fresh brief. When that's the
+case, the task prompt below will say so explicitly and point you at
+job/prior_revision/<canvas>/{{plate.png,overlay.html,render.png}} (the
+existing, already-approved-enough-to-comment-on output) and the actual
+comments with their region coordinates. There is no rule anywhere that
+decides for you whether a given comment needs a small overlay tweak (move
+text, change a word, swap the CTA color) or a full plate regeneration
+(the comment is about the photo/illustration itself, not the copy or
+layout) - that judgment call is yours to make per comment, the same way a
+human designer would read a comment and decide how much of the ad it
+actually touches. Keep whatever a comment doesn't ask you to change
+exactly as it was; re-deriving an ad from scratch when only one line of
+copy needed to move defeats the point of an edit.
 """
 
 
 def build_task_prompt(job: dict) -> str:
     canvases = "\n".join(f"  - {c['name']}: {c['width']}x{c['height']}" for c in job["canvases"])
+
+    if job.get("is_edit"):
+        comments = job.get("comments", [])
+        comments_block = "\n\n".join(
+            f"  Comment on canvas '{c['canvas_name']}', region "
+            f"x={c['region'].get('x')} y={c['region'].get('y')} "
+            f"w={c['region'].get('width')} h={c['region'].get('height')}:\n"
+            f'  "{c["body"]}" - {c["author"] or "unknown"}'
+            for c in comments
+        ) or "  (no open comments - re-produce this revision as-is unless you spot a real brand violation)"
+
+        return f"""Edit request - revision {job['revision_number']} of an ad that already
+exists as revision {job['prior_revision_number']}.
+
+Campaign: {job['campaign']}
+Copy (current, may already reflect what the comments below are asking for -
+check before assuming a comment is still unaddressed):
+{json.dumps(job['copy'], indent=2)}
+
+Canvases required:
+{canvases}
+
+The previous revision's actual output is available at
+job/prior_revision/<canvas>/{{plate.png,overlay.html,render.png}} for each
+canvas above - read it before changing anything.
+
+Open comments left on the previous revision:
+{comments_block}
+
+For each canvas, decide whether the comments touching it call for a
+targeted change (move/resize/recolor an overlay element, edit copy, swap
+the CTA) or require a new plate (the comment is about the photo/
+illustration itself). Produce ./output/<name>/{{plate.png,overlay.html,render.png}}
+for every canvas exactly as a fresh generation would, following the skill
+contract and the type-scale rules in your system prompt - reusing the
+prior plate.png directly (copy it forward) is correct when no comment
+requires regenerating it. Look at each final render before considering it
+done, the same as any other run.
+"""
+
     return f"""New generation request.
 
 Campaign: {job['campaign']}

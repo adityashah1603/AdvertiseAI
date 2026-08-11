@@ -25,8 +25,10 @@ from dotenv import load_dotenv
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 load_dotenv(os.path.join(ROOT, ".env"))
 sys.path.insert(0, os.path.join(ROOT, "supabase"))
+sys.path.insert(0, os.path.join(ROOT, "worker", "hydration"))
 
 from onboarding import get_client  # noqa: E402
+from storage_paths import revision_prefix  # noqa: E402
 
 
 def _expected_output_paths(canvases):
@@ -57,7 +59,7 @@ def mint_upload_urls(tenant_id, request_id, revision_number):
         )
 
     bucket = tenant["jobs_bucket"]
-    prefix = f"{request_id}/revisions/{revision_number}"
+    prefix = revision_prefix(request["campaign"], request_id, revision_number)
 
     # FINDING (2026-08-10): create_signed_upload_url reserves the path even
     # before anything is uploaded to it, so minting for the same
