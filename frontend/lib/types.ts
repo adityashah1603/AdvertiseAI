@@ -1,6 +1,7 @@
 // Mirrors supabase/migrations/0001_init.sql + 0004_comments.sql +
-// 0007_inspirations_bucket.sql exactly - this file has no independent
-// opinion about the schema, it just names it for the TypeScript side.
+// 0007_inspirations_bucket.sql + 0008_deploys.sql exactly - this file has
+// no independent opinion about the schema, it just names it for the
+// TypeScript side.
 
 export type Tenant = {
   id: string;
@@ -100,6 +101,24 @@ export type Comment = {
   body: string;
   author: string | null;
   status: CommentStatus;
+  created_at: string;
+};
+
+export type DeployStatus = "pending" | "running" | "succeeded" | "failed";
+
+export type Deploy = {
+  id: string;
+  revision_id: string;
+  run_id: string;
+  adstream_ad_name: string | null;
+  adstream_url: string | null;
+  // Only ever true once execute_deploy_run.py has confirmed BOTH the
+  // agent's own detail-page read-back AND that a real recording landed in
+  // Storage - never set speculatively, never trust this field's absence of
+  // falseness as "still in progress" (check deployRun.status for that).
+  verified: boolean;
+  recording_path: string | null;
+  status: DeployStatus;
   created_at: string;
 };
 

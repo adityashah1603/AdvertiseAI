@@ -14,8 +14,16 @@ not in this script.
 
 This script's own ThreadPoolExecutor is just a convenience for running
 multiple claimed executions concurrently within one process - it is sized
-to the cap so it never even attempts more than the DB would allow, but the
-DB check is what actually matters.
+to the combined cap so it never even attempts more than the DB would
+allow, but the DB check is what actually matters.
+
+Phase 4 addition: deploy runs ('type'='deploy') are claimed and counted
+completely separately from generate/edit runs, via claim_next_deploy_run()
+(supabase/migrations/0009_deploy_concurrency_cap.sql) and its own
+GENERATION_CONCURRENCY_CAP-independent env var, DEPLOYMENT_CONCURRENCY_CAP -
+"two independent caps, not one... should never block each other"
+(DECISIONS.md SS3.3). Polled in the same loop, routed to a different
+executor by run type, but never sharing a slot count with generation/edit.
 """
 import os
 import sys
@@ -30,22 +38,33 @@ sys.path.insert(0, os.path.join(ROOT, "supabase"))
 
 from onboarding import get_client  # noqa: E402
 from execute_run import execute_claimed_run  # noqa: E402
+from execute_deploy_run import execute_claimed_deploy_run  # noqa: E402
 
 POLL_INTERVAL_S = 3
 
 
-def run_dispatcher(cap, drain=True):
+def run_dispatcher(cap, drain=True, deploy_cap=None):
     """
-    drain=True (used by the concurrency test): stop once claim_next_run
-    has nothing more to give AND no run is still queued/running - i.e. all
-    enqueued work has finished. drain=False: poll forever, like a real
-    always-on worker process would.
+    drain=True (used by the concurrency test): stop once neither
+    claim_next_run() nor claim_next_deploy_run() has anything more to give
+    AND no run is still queued/running - i.e. all enqueued work has
+    finished. drain=False: poll forever, like a real always-on worker
+    process would.
+
+    deploy_cap defaults to DEPLOYMENT_CONCURRENCY_CAP - kept as a separate
+    parameter (not derived from `cap`) so the two pools are visibly
+    independent at every call site, not just in the SQL.
     """
+    if deploy_cap is None:
+        deploy_cap = int(os.environ.get("DEPLOYMENT_CONCURRENCY_CAP", 1))
+
     client = get_client()
     futures = []
 
-    with ThreadPoolExecutor(max_workers=cap) as pool:
+    with ThreadPoolExecutor(max_workers=cap + deploy_cap) as pool:
         while True:
+            got_work = False
+
             claimed = client.rpc("claim_next_run", {"p_cap": cap}).execute().data
             if claimed:
                 run = claimed[0]
@@ -53,6 +72,18 @@ def run_dispatcher(cap, drain=True):
                       f"(tenant={run['tenant_id']}, request={run['request_id']}, "
                       f"revision={run['revision_number']})")
                 futures.append(pool.submit(_run_and_report, run))
+                got_work = True
+
+            claimed_deploy = client.rpc("claim_next_deploy_run", {"p_cap": deploy_cap}).execute().data
+            if claimed_deploy:
+                run = claimed_deploy[0]
+                print(f"[dispatcher] claimed DEPLOY run {run['id']} "
+                      f"(tenant={run['tenant_id']}, request={run['request_id']}, "
+                      f"revision={run['revision_number']})")
+                futures.append(pool.submit(_run_and_report_deploy, run))
+                got_work = True
+
+            if got_work:
                 continue  # try to claim more immediately, no need to sleep
 
             if drain:
@@ -75,6 +106,14 @@ def _run_and_report(run):
         return execute_claimed_run(run)
     except Exception as e:  # noqa: BLE001 - already recorded to the run row; log and move on
         print(f"[dispatcher] run {run['id']} raised: {e}")
+        return run["id"], "failed"
+
+
+def _run_and_report_deploy(run):
+    try:
+        return execute_claimed_deploy_run(run)
+    except Exception as e:  # noqa: BLE001 - already recorded to the run row; log and move on
+        print(f"[dispatcher] deploy run {run['id']} raised: {e}")
         return run["id"], "failed"
 
 

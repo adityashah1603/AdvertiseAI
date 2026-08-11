@@ -12,7 +12,7 @@ Write-up accompanying the code. Positions, not features — no version graphs, d
 | Phase 1 — generation pipeline | done | 4 brands live through real sandbox path, zero code changes per brand |
 | Phase 2 — engine | done | Concurrency, resume, crash-recovery all proven live, not asserted |
 | Phase 3 — feedback surface | done | Pinned comments, drag-to-pin UI, resolved-status all live |
-| Phase 4 — deployment | not started | No sandbox image, no hydrate_deploy, no Adstream, no deploys table |
+| Phase 4 — deployment | done | Real Adstream deploys, verified detail-page read-back, webm recording, independent concurrency pool — all live |
 
 Stubbed by choice: brand-kit versioning, conformance grader, edit-routing classifier, scheduler beyond FIFO, credential permission system.
 
@@ -20,13 +20,14 @@ Stubbed by choice: brand-kit versioning, conformance grader, edit-routing classi
 
 ## 2. Next steps
 
-- Build Part 4 (Deploy) — same hydrate/sandbox/save/destroy shape + browser + Adstream creds + detail-page read-back.
 - One dispatcher process per env, or matching caps — mixed caps let peak exceed the lower one (found live).
 - Pin every venv's deps — orchestrator had none, silently drifted e2b versions, broke sandbox creation twice.
 - Re-billing on retry not avoided — nice-to-have per brief, not fixed.
 - RLS still unbuilt — harmless today (server-only access), revisit if client-side Supabase access is ever added.
 - Re-run 4-tenant concurrent edit test — last clean run only had 2 tenants eligible.
 - Write top-level README.md — venv-per-script ambiguity caused a real outage.
+- Adstream's create flow only takes one image per ad — deploy agent now creates one ad per canvas when a revision has multiple; worth a cleaner multi-creative story if Adstream ever supports it.
+- Adstream's Campaign field is a fixed 4-option dropdown, no free text — every deploy currently maps to the closest existing bucket; document this mapping rule explicitly rather than leaving it to per-run agent judgment if it matters later.
 
 ---
 
@@ -50,12 +51,12 @@ Position: `open` → `resolved` (edit run against it succeeded, built + verified
 No coordinate remapping, no pixel diffing, ever.
 
 ### 4.3 Concurrency cap + the 4th request
-Position: env-var cap per run-type, Postgres row-lock (`claim_next_run`) enforces it, excess sits `queued` FIFO, visible in UI.
+Position: env-var cap per run-type, Postgres row-lock (`claim_next_run` for generate/edit, `claim_next_deploy_run` for deploy — two independent pools, built and proven concurrent live) enforces it, excess sits `queued` FIFO, visible in UI.
 Real nuance: cap is per-caller, not global — two dispatchers with different caps can jointly exceed the lower one.
 
 ### 4.4 Credential blast radius
 Generation sandbox: OpenAI + Anthropic keys, per-file signed upload URLs only — no DB key, no other tenant's data, no Adstream.
-Deploy sandbox (not built): Adstream login + Kernel key only, no OpenAI key, no brand-kit access.
+Deploy sandbox: Anthropic key + Adstream login only, no OpenAI key, no brand-kit access, no DB key. Recording via Playwright (`record_video_dir`), not Kernel — `KERNEL_API_KEY` is unset, and the brief sanctions this fallback explicitly.
 
 ---
 
@@ -87,6 +88,8 @@ Deploy sandbox (not built): Adstream login + Kernel key only, no OpenAI key, no 
 - Comment `resolved` was designed here but never coded — found via real stale data, fixed, backfilled.
 - Inspirations were tracked but never fetched — full fix: per-tenant bucket, real picker UI, hydration fetch.
 - Brand data: Emplifi DESIGN.md vs tokens.json disagree (DESIGN.md wins); Kahua's own DESIGN.md self-contradicts (56px table vs 48px prose — prose wins, more operational); missing assets omitted, never faked.
+- Part 4 first real attempt succeeded outright: signed in, completed the 3-step flow, waited for real state (never a fixed sleep), read the detail page back before setting verified. Two real Adstream constraints found: only one image per ad (agent now creates one ad per canvas when needed), and Campaign is a fixed 4-option dropdown with no free text or create-new.
+- Playwright's `record_video_dir` outputs `.webm`, not `.mp4` — spec docs said `.mp4`; verified before building, not assumed. No `ffmpeg` conversion added; browsers play `.webm` natively and "no recording, no deploy" doesn't require a specific container format.
 
 ---
 
@@ -100,6 +103,7 @@ Deploy sandbox (not built): Adstream login + Kernel key only, no OpenAI key, no 
 - No hardcoded ordering — FIFO claim, no tenant-aware logic; proven under real concurrent load.
 - No brand-conformance grader — only deterministic structural checks + mandatory human/agent "look at it."
 - No edit-routing classifier — left entirely to the agent, every time.
-- SKILL.md invariants (plate-first, one plate per size, every word live HTML, logo natural proportions, DESIGN.md wins, inspirations reference-only, never publish) — held; enforced via agent system prompt + structural checks, never a scoring program.
+- SKILL.md invariants (plate-first, one plate per size, every word live HTML, logo natural proportions, DESIGN.md wins, inspirations reference-only, never publish) — held; enforced via agent system prompt + structural checks, never a scoring program. Generation-only; the deploy agent doesn't use SKILL.md, it has its own contract.
+- Part 4 specific: browser runs only inside the sandbox, never the orchestrator's machine — confirmed by construction, Playwright only ever executes via `sbx.commands.run(...)`. No recording in Storage = automatic `failed`, enforced by `execute_deploy_run.py`, not left to the agent's own claim. `verified=true` requires both a real Storage-confirmed recording AND the agent's own detail-page read-back — never set speculatively.
 
 **Status: zero hard-constraint violations found**, current code, both docs cross-checked.

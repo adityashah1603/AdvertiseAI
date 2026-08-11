@@ -48,6 +48,50 @@ def _expected_output_paths(canvases):
     return paths
 
 
+def _expected_deploy_output_paths():
+    # Deliberately under the SAME tenant jobs_bucket, at
+    # {revision_prefix}/deploy/... - not the shared-prefix top-level
+    # "deploys/" bucket ROADMAP.md SS3.2 originally sketched (that section
+    # itself flags that pattern as "still shared-prefix... haven't been
+    # revisited under the [per-tenant] lens yet"). Reusing the tenant's own
+    # jobs_bucket + revision_prefix() keeps deploy artifacts under the exact
+    # same isolation guarantee everything else in this bucket already has,
+    # with no new bucket to create - the same judgment call already applied
+    # to inspirations_bucket this session, extended once more here.
+    return ["deploy/recording.webm", "deploy/RESULT.json", "deploy/agent-transcript.jsonl", "deploy/_status.json"]
+
+
+def mint_deploy_upload_urls(tenant_id, request_id, revision_number):
+    client = get_client()
+
+    tenant = client.table("tenants").select("*").eq("id", tenant_id).single().execute().data
+    request = client.table("requests").select("*").eq("id", request_id).single().execute().data
+    if request["tenant_id"] != tenant["id"]:
+        raise ValueError(
+            f"tenant_id {tenant_id} does not own request {request_id} - refusing to mint upload URLs."
+        )
+
+    bucket = tenant["jobs_bucket"]
+    prefix = revision_prefix(request["campaign"], request_id, revision_number)
+
+    from storage3.types import CreateSignedUploadUrlOptions
+
+    urls = {}
+    for rel_path in _expected_deploy_output_paths():
+        full_path = f"{prefix}/{rel_path}"
+        signed = client.storage.from_(bucket).create_signed_upload_url(
+            full_path, CreateSignedUploadUrlOptions(upsert="true")
+        )
+        # Keys handed to the sandbox are the OUTPUT-side names the agent
+        # actually writes to ./output/ (recording.webm, RESULT.json, ...),
+        # not the deploy/-prefixed Storage path - same "keys are the
+        # sandbox-local name" convention _expected_output_paths() already
+        # uses for generation.
+        urls[rel_path.split("/", 1)[1]] = signed["signed_url"]
+
+    return urls
+
+
 def mint_upload_urls(tenant_id, request_id, revision_number):
     client = get_client()
 

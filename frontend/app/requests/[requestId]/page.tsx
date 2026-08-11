@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type PointerEvent } from "react";
 import { Paperclip, X } from "lucide-react";
-import type { Asset, Comment, Region, RequestRow, Revision, Run } from "@/lib/types";
+import type { Asset, Comment, Deploy, Region, RequestRow, Revision, Run } from "@/lib/types";
 
 type CommentWithRevisionNumber = Comment & { revision_number: number | null };
 
@@ -15,6 +15,8 @@ type StatusResponse = {
   run: Run | null;
   assets: (Asset & { plate_url: string | null; render_url: string | null })[];
   comments: CommentWithRevisionNumber[];
+  deployRun: Run | null;
+  deploy: (Deploy & { recording_url: string | null }) | null;
 };
 
 type EditComment = { canvas_name: string; region: Region; body: string; author?: string };
@@ -23,6 +25,16 @@ type EditRequestFile = { kind?: "edit"; comments?: EditComment[] };
 const TERMINAL_RUN_STATUSES = new Set(["succeeded", "failed", "crashed"]);
 const POLL_INTERVAL_MS = 2000;
 const MIN_DRAG_PX = 8; // below this, treat a pointer down/up as a "click", not a drag
+
+// Polling stops only once BOTH the generate/edit run and any in-flight
+// deploy run have reached a terminal state - a deploy fired while the
+// generate/edit side is already done must still keep the poll alive on its
+// own.
+function isSettled(json: { run: Run | null; deployRun: Run | null }): boolean {
+  const runDone = !json.run || TERMINAL_RUN_STATUSES.has(json.run.status);
+  const deployDone = !json.deployRun || TERMINAL_RUN_STATUSES.has(json.deployRun.status);
+  return runDone && deployDone;
+}
 
 export default function RequestDetailPage() {
   const params = useParams<{ requestId: string }>();
@@ -38,6 +50,8 @@ export default function RequestDetailPage() {
   const [commentBody, setCommentBody] = useState("");
   const [editSubmitting, setEditSubmitting] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
+  const [deploySubmitting, setDeploySubmitting] = useState(false);
+  const [deployError, setDeployError] = useState<string | null>(null);
 
   const imgRef = useRef<HTMLImageElement>(null);
   const dragStart = useRef<{ x: number; y: number } | null>(null);
@@ -59,7 +73,7 @@ export default function RequestDetailPage() {
         setError(null);
         setData(json as StatusResponse);
         setSelectedCanvas((prev) => prev ?? json.request?.canvases?.[0]?.name ?? null);
-        if (json.run && TERMINAL_RUN_STATUSES.has(json.run.status) && timerRef.current) {
+        if (isSettled(json) && timerRef.current) {
           clearInterval(timerRef.current);
           timerRef.current = null;
         }
@@ -83,7 +97,7 @@ export default function RequestDetailPage() {
       const r = await fetch(`/api/requests/${requestId}`, { cache: "no-store" });
       const j = await r.json();
       setData(j);
-      if (j.run && TERMINAL_RUN_STATUSES.has(j.run.status) && timerRef.current) {
+      if (isSettled(j) && timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
       }
@@ -197,6 +211,23 @@ export default function RequestDetailPage() {
     }
   }
 
+  async function submitDeploy() {
+    setDeploySubmitting(true);
+    setDeployError(null);
+    try {
+      const res = await fetch(`/api/requests/${requestId}/deploy`, { method: "POST" });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "deploy failed");
+      const refreshed = await fetch(`/api/requests/${requestId}`, { cache: "no-store" });
+      setData(await refreshed.json());
+      restartPolling();
+    } catch (err) {
+      setDeployError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setDeploySubmitting(false);
+    }
+  }
+
   function submitDraftComment() {
     if (!draftRegion || !selectedCanvas || !commentBody.trim()) return;
     postComments([{ canvas_name: selectedCanvas, region: draftRegion, body: commentBody, author: "ui" }]);
@@ -231,8 +262,9 @@ export default function RequestDetailPage() {
     );
   }
 
-  const { request, tenant, revision, run, assets } = data;
+  const { request, tenant, revision, run, assets, deployRun, deploy } = data;
   const revisionReady = revision?.status === "ready";
+  const deployInFlight = !!deployRun && !TERMINAL_RUN_STATUSES.has(deployRun.status);
 
   return (
     <div className="workspace">
@@ -343,6 +375,61 @@ export default function RequestDetailPage() {
           <p className="muted" style={{ marginTop: "0.5rem" }}>
             {visibleComments.filter((c) => c.status === "open").length} open comment(s)
           </p>
+        </div>
+
+        <div className="side-section">
+          <h3>Deploy</h3>
+          {!revisionReady ? (
+            <p className="muted">Wait for the current revision to finish before deploying.</p>
+          ) : (
+            <>
+              <button onClick={submitDeploy} disabled={deploySubmitting || deployInFlight}>
+                {deployInFlight
+                  ? "Deploying…"
+                  : deploy
+                  ? "Deploy again"
+                  : "Deploy to Adstream"}
+              </button>
+              {deployError && <p className="error" style={{ marginTop: "0.5rem" }}>{deployError}</p>}
+
+              {deployRun && (
+                <div style={{ marginTop: "0.75rem" }}>
+                  <span className={`status-pill status-${deployRun.status}`}>{deployRun.status}</span>
+                  {deployRun.status === "failed" && deployRun.error_message && (
+                    <p className="error" style={{ marginTop: "0.5rem" }}>{deployRun.error_message}</p>
+                  )}
+                </div>
+              )}
+
+              {deploy && (
+                <div style={{ marginTop: "0.75rem" }}>
+                  <p className="muted" style={{ marginBottom: "0.25rem" }}>
+                    {deploy.verified ? "✓ Verified via Adstream's own detail page" : "Not verified"}
+                  </p>
+                  {deploy.adstream_ad_name && (
+                    <p className="mono" style={{ fontSize: "0.85rem" }}>{deploy.adstream_ad_name}</p>
+                  )}
+                  {deploy.adstream_url && (
+                    <a href={deploy.adstream_url} target="_blank" rel="noreferrer" style={{ fontSize: "0.85rem" }}>
+                      {deploy.adstream_url}
+                    </a>
+                  )}
+                  {deploy.recording_url ? (
+                    <video
+                      src={deploy.recording_url}
+                      controls
+                      style={{ width: "100%", marginTop: "0.5rem", borderRadius: 6 }}
+                    />
+                  ) : (
+                    <p className="muted" style={{ marginTop: "0.5rem" }}>
+                      No recording available — per the brief's own rule, a deploy with no recording
+                      is treated as failed regardless of what the browser did.
+                    </p>
+                  )}
+                </div>
+              )}
+            </>
+          )}
         </div>
 
         {draftRegion && (

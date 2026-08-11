@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSupabase } from "@/lib/supabase";
-import type { Asset, Comment, RequestRow, Revision, Run } from "@/lib/types";
+import type { Asset, Comment, Deploy, RequestRow, Revision, Run } from "@/lib/types";
 
 const SIGNED_URL_TTL_S = 120;
 
@@ -43,11 +43,18 @@ export async function GET(
   let assets: (Asset & { plate_url: string | null; render_url: string | null })[] = [];
 
   if (latest) {
+    // Scoped to type != 'deploy' on purpose - a deploy run shares the same
+    // revision_number as the revision it deploys (it never produces a new
+    // one), so without this filter a deploy fired against the latest
+    // revision would outrank the actual generate/edit run here by
+    // created_at and silently swap what this field means. Deploy state has
+    // its own field below instead.
     const { data: runs, error: runErr } = await client
       .from("runs")
       .select("*")
       .eq("request_id", requestId)
       .eq("revision_number", latest.revision_number)
+      .neq("type", "deploy")
       .order("created_at", { ascending: false })
       .limit(1);
     if (runErr) return NextResponse.json({ error: runErr.message }, { status: 500 });
@@ -70,6 +77,37 @@ export async function GET(
           return { ...asset, plate_url: plateUrl, render_url: renderUrl };
         })
       );
+    }
+  }
+
+  // Most recent deploy attempt for this request, regardless of which
+  // revision it targeted - deploying an older revision while a newer one
+  // exists is a valid (if unusual) action, so this deliberately isn't
+  // scoped to `latest` the way `run`/`assets` above are. A deployRun with
+  // no matching `deploys` row yet means still queued/running - a real
+  // `deploys` row (recording_path, verified) only ever exists once
+  // execute_deploy_run.py's own Storage-verified check passed.
+  const { data: deployRuns } = await client
+    .from("runs")
+    .select("*")
+    .eq("request_id", requestId)
+    .eq("type", "deploy")
+    .order("created_at", { ascending: false })
+    .limit(1);
+  const deployRun = (deployRuns?.[0] ?? null) as Run | null;
+
+  let deploy: (Deploy & { recording_url: string | null }) | null = null;
+  if (deployRun) {
+    const { data: deployRows } = await client
+      .from("deploys")
+      .select("*")
+      .eq("run_id", deployRun.id)
+      .maybeSingle();
+    if (deployRows && tenantRow?.jobs_bucket) {
+      const recordingUrl = deployRows.recording_path
+        ? await signOrNull(client, tenantRow.jobs_bucket, deployRows.recording_path)
+        : null;
+      deploy = { ...(deployRows as Deploy), recording_url: recordingUrl };
     }
   }
 
@@ -97,6 +135,8 @@ export async function GET(
     run,
     assets,
     comments,
+    deployRun,
+    deploy,
   });
 }
 
