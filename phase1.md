@@ -127,10 +127,10 @@ stated values.
    728x90 (a leaderboard banner format) isn't actually a native placement on
    any of those three platforms anyway, so chasing a workaround for it was
    solving the wrong problem. No longer an open CEO question to resolve;
-   the three working sizes (square/landscape/portrait) already correspond
-   to real Instagram/Facebook feed placements. Worth a follow-up look at
-   whether a 9:16 vertical size (Stories/Reels/TikTok's actual native
-   format) matters more than 728x90 ever did - not yet decided.
+   the four working sizes (square/landscape/portrait/**story**) now cover
+   real Instagram/Facebook feed placements plus Stories/Reels/TikTok's
+   actual native 9:16 shape - added same-day, confirmed working live (see
+   section 3).
 2. **A scoring bug in the size-resolution search**, found while fixing (1):
    widening the search range briefly caused it to pick a needlessly huge
    (5x oversized) generation for a ratio improvement of 0.003% - fixed by
@@ -259,6 +259,19 @@ stated values.
   real incident**, not speculative hardening - added directly in response
   to not being able to tell a slow run from a stuck one.
 
+**Confirmed (2026-08-11): adding the 9:16 "story" canvas required exactly
+one line of change** - a new entry in `create_test_request.py`'s shared
+`CANVASES` list. Nothing in `hydrate_generation`, `mint_upload_urls`,
+`run_generation.py`, or `agent_runner.py` needed to change, because none of
+them ever hardcoded which canvases exist - they all iterate over whatever
+`request["canvases"]` contains. Ran for real against Emplifi (all four
+sizes in one request): succeeded, the agent held 48px on every canvas
+including the new one, and independently verified the actual story render -
+correct 9:16 proportions, on-brand, and the plate's product-grid phone
+mockup ties directly into the campaign headline. This is the same kind of
+evidence as the three-brand confirmation in section 6: the architecture
+being genuinely generic, not asserted to be.
+
 ---
 
 ## 4. Checklist: achieved vs. still open
@@ -284,7 +297,8 @@ stated values.
 - [ ] Tighten the type-scale instruction to specify role-to-value mapping, not just "use a real value" (finding #13)
 
 ### Explicitly open - belongs to later phases, not blocking Phase 1, but real
-- [x] ~~728x90 leaderboard - open question for the CEO~~ - resolved 2026-08-11: deliberately out of scope, not a real Facebook/Instagram/TikTok placement anyway; no longer pending. Possible follow-up: a 9:16 vertical size for Stories/Reels/TikTok, not yet decided.
+- [x] ~~728x90 leaderboard - open question for the CEO~~ - resolved 2026-08-11: deliberately out of scope, not a real Facebook/Instagram/TikTok placement anyway; no longer pending.
+- [x] ~~9:16 vertical size for Stories/Reels/TikTok~~ - added and confirmed working live 2026-08-11 (Emplifi, all four canvases in one request, story render independently verified)
 - [ ] The "horrifying test case": concurrent multi-tenant requests, never run
 - [ ] Deliberate resume test: kill a box mid-task on purpose, confirm a fresh box picks up cleanly (informally exercised via real failures, never as a controlled test)
 - [ ] Deliberate crash-recovery test with documented recoverable/unrecoverable states
@@ -354,10 +368,8 @@ the full traced explanation of why this is real evidence, not an assertion.
    prompt-inheritance gap between outer-session memory and in-sandbox agent
    instructions.
 4. ~~Resolve the 728x90 leaderboard question with the CEO~~ - resolved
-   2026-08-11: deliberately out of scope (see finding #1). Consider whether
-   a 9:16 vertical size (Stories/Reels/TikTok's real native format) is
-   worth adding instead - a real platform-compatibility question, not a
-   generic-banner one.
+   2026-08-11: deliberately out of scope (see finding #1). ~~Consider adding
+   a 9:16 vertical size~~ - done same day, confirmed working live.
 5. When the real day-two brand shows up, run it through this exact
    pipeline unmodified - that's the actual test everything in this file has
    been rehearsing for.

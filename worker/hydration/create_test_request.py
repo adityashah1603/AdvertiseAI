@@ -71,14 +71,24 @@ TEST_REQUESTS = {
     },
 }
 
-# Leaderboard (728x90) deliberately excluded for every brand - still
-# architecturally blocked per phase0/README.md finding #2/#2b (gpt-image-2's
-# 3:1 max ratio + total-pixel floor), unresolved with the CEO. Not a bug to
-# work around here.
+# Leaderboard (728x90) deliberately dropped from scope entirely (decision,
+# 2026-08-11, see phase1.md section 3): the real goal is Facebook/Instagram/
+# TikTok compatibility, and a 728x90 IAB banner isn't a native placement on
+# any of those three anyway - not worth the architectural fight it would
+# take (gpt-image-2's 3:1 max ratio + total-pixel floor make it impossible
+# outright, not just inconvenient).
+#
+# "story" (1080x1920, 9:16) added in its place - the actual native shape for
+# Instagram/Facebook Stories, Reels, and TikTok's primary format. Unlike the
+# leaderboard, this ratio is well within gpt-image-2's real constraints (9:16
+# = 0.5625, nowhere near the 3:1 cap; 1080x1920 = 2,073,600px, comfortably
+# inside the 655,360-8,294,400 floor/ceiling) - the existing divisible-by-16
+# rounding in call_gpt_image.py handles the rest, same as every other size.
 CANVASES = [
     {"name": "square", "width": 1080, "height": 1080},
     {"name": "landscape", "width": 1200, "height": 628},
     {"name": "portrait", "width": 1080, "height": 1350},
+    {"name": "story", "width": 1080, "height": 1920},
 ]
 
 
