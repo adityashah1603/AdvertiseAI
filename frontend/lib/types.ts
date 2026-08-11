@@ -1,6 +1,6 @@
-// Mirrors supabase/migrations/0001_init.sql + 0004_comments.sql exactly -
-// this file has no independent opinion about the schema, it just names it
-// for the TypeScript side.
+// Mirrors supabase/migrations/0001_init.sql + 0004_comments.sql +
+// 0007_inspirations_bucket.sql exactly - this file has no independent
+// opinion about the schema, it just names it for the TypeScript side.
 
 export type Tenant = {
   id: string;
@@ -8,8 +8,11 @@ export type Tenant = {
   name: string;
   brand_kit_bucket: string | null;
   jobs_bucket: string | null;
+  inspirations_bucket: string | null;
   created_at: string;
 };
+
+export type Inspiration = { filename: string; url: string | null };
 
 export type Canvas = { name: string; width: number; height: number };
 

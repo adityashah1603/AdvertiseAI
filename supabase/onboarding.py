@@ -13,18 +13,19 @@ actually tested.
 What onboarding a tenant means, concretely:
   1. Insert a `tenants` row (idempotent by slug - re-onboarding an existing
      slug reuses its id/buckets rather than duplicating).
-  2. Create two Storage buckets scoped to this tenant alone:
-     brandkit-{slug}-{short_id} and jobs-{slug}-{short_id}. Per-tenant
-     buckets, not a shared bucket with a tenant_id-prefixed path - see
-     DECISIONS.md for the reasoning (a bug in one tenant's bucket setup
-     stays contained to that bucket, rather than one shared policy
-     protecting everyone at once). Named with the tenant's own slug (not
-     just a bare UUID) so a human scanning the Storage dashboard can tell
-     whose data a bucket holds without cross-referencing the `tenants`
-     table - the {short_id} suffix (the tenant id's own first 8 hex
-     characters) exists only for guaranteed uniqueness if a slug were ever
-     reused, never for lookup: every place that actually NEEDS a bucket
-     name reads it from `tenants.brand_kit_bucket`/`jobs_bucket`, never
+  2. Create three Storage buckets scoped to this tenant alone:
+     brandkit-{slug}-{short_id}, jobs-{slug}-{short_id}, and
+     inspirations-{slug}-{short_id}. Per-tenant buckets, not a shared bucket
+     with a tenant_id-prefixed path - see DECISIONS.md for the reasoning (a
+     bug in one tenant's bucket setup stays contained to that bucket, rather
+     than one shared policy protecting everyone at once). Named with the
+     tenant's own slug (not just a bare UUID) so a human scanning the
+     Storage dashboard can tell whose data a bucket holds without
+     cross-referencing the `tenants` table - the {short_id} suffix (the
+     tenant id's own first 8 hex characters) exists only for guaranteed
+     uniqueness if a slug were ever reused, never for lookup: every place
+     that actually NEEDS a bucket name reads it from
+     `tenants.brand_kit_bucket`/`jobs_bucket`/`inspirations_bucket`, never
      reconstructs it from the slug. This is cosmetic/organizational, not a
      sandbox-identity concern - ROADMAP.md's "no tenant-specific identity"
      disqualifier is explicitly about a SANDBOX's image/template/name/id,
@@ -32,13 +33,18 @@ What onboarding a tenant means, concretely:
      by design) happen to be labeled.
   3. If brand-kit files are given, upload them into the brand-kit bucket -
      at the bucket root now, not under a tenant_id prefix, since the
-     bucket itself is the isolation boundary.
+     bucket itself is the isolation boundary. Same for inspiration files,
+     into the inspirations bucket, if any are given.
   4. Leave the jobs bucket empty - that's populated per run, by the agent,
      not at onboarding time.
+  5. A tenant onboarded before the inspirations bucket existed gets one
+     backfilled the next time onboard_tenant() runs for its slug -
+     re-running onboarding for an already-existing tenant is always
+     idempotent, additive-only, never destructive.
 
 Deliberately NOT built here: brand-kit versioning, re-upload history, or
 validation that rejects an incomplete brand kit. Real brand kits are
-incomplete (see phase0/README.md's findings on Kahua's missing font and
+incomplete (see DECISIONS.md SS6's findings on Kahua's missing font and
 logo) - onboarding accepts what it's given and lets hydration's existing
 omit-don't-fake behavior handle gaps at generation time, not at intake time.
 """
@@ -83,9 +89,36 @@ def _upload_brand_kit(client, bucket, local_dir):
     return count
 
 
-def onboard_tenant(client, slug, name, local_brand_kit_dir=None):
-    """Returns {"id", "brand_kit_bucket", "jobs_bucket"} for the tenant,
-    whether it was just created or already existed."""
+def _upload_flat(client, bucket, local_dir):
+    """Uploads every file directly inside local_dir (no subfolder structure
+    expected - inspiration images are just a flat pile of files)."""
+    count = 0
+    for fname in os.listdir(local_dir):
+        full = os.path.join(local_dir, fname)
+        if os.path.isfile(full):
+            with open(full, "rb") as f:
+                data = f.read()
+            client.storage.from_(bucket).upload(fname, data, {"upsert": "true"})
+            count += 1
+    return count
+
+
+def _create_bucket_idempotent(client, bucket_name):
+    """create_bucket() raises a 409 Duplicate if the bucket already exists -
+    expected on a retry after a partial failure (e.g. the bucket got created
+    but the tenants-row update that should have recorded its name failed
+    right after, as happened for real once against a stale PostgREST schema
+    cache). Same tolerance migrate_bucket_naming.py already uses."""
+    try:
+        client.storage.create_bucket(bucket_name, options={"public": False})
+    except Exception as e:  # noqa: BLE001 - re-raise anything that isn't the expected duplicate
+        if "already exists" not in str(e).lower() and "duplicate" not in str(e).lower():
+            raise
+
+
+def onboard_tenant(client, slug, name, local_brand_kit_dir=None, local_inspirations_dir=None):
+    """Returns {"id", "brand_kit_bucket", "jobs_bucket", "inspirations_bucket"}
+    for the tenant, whether it was just created or already existed."""
     existing = client.table("tenants").select("*").eq("slug", slug).execute()
 
     if existing.data:
@@ -93,28 +126,51 @@ def onboard_tenant(client, slug, name, local_brand_kit_dir=None):
         tenant_id = tenant["id"]
         brand_kit_bucket = tenant["brand_kit_bucket"]
         jobs_bucket = tenant["jobs_bucket"]
+        inspirations_bucket = tenant.get("inspirations_bucket")
         print(f"Tenant '{slug}' already exists: {tenant_id}")
+
+        if not inspirations_bucket:
+            short_id = tenant_id.split("-")[0]
+            inspirations_bucket = f"inspirations-{slug}-{short_id}"
+            _create_bucket_idempotent(client, inspirations_bucket)
+            client.table("tenants").update(
+                {"inspirations_bucket": inspirations_bucket}
+            ).eq("id", tenant_id).execute()
+            print(f"  Backfilled inspirations_bucket: {inspirations_bucket}")
     else:
         result = client.table("tenants").insert({"slug": slug, "name": name}).execute()
         tenant_id = result.data[0]["id"]
         short_id = tenant_id.split("-")[0]  # UUID's own first 8 hex chars - no new id invented
         brand_kit_bucket = f"brandkit-{slug}-{short_id}"
         jobs_bucket = f"jobs-{slug}-{short_id}"
+        inspirations_bucket = f"inspirations-{slug}-{short_id}"
 
-        client.storage.create_bucket(brand_kit_bucket, options={"public": False})
-        client.storage.create_bucket(jobs_bucket, options={"public": False})
+        _create_bucket_idempotent(client, brand_kit_bucket)
+        _create_bucket_idempotent(client, jobs_bucket)
+        _create_bucket_idempotent(client, inspirations_bucket)
 
         client.table("tenants").update({
             "brand_kit_bucket": brand_kit_bucket,
             "jobs_bucket": jobs_bucket,
+            "inspirations_bucket": inspirations_bucket,
         }).eq("id", tenant_id).execute()
 
         print(f"Created tenant '{slug}': {tenant_id}")
-        print(f"  brand_kit_bucket: {brand_kit_bucket}")
-        print(f"  jobs_bucket:      {jobs_bucket}")
+        print(f"  brand_kit_bucket:    {brand_kit_bucket}")
+        print(f"  jobs_bucket:         {jobs_bucket}")
+        print(f"  inspirations_bucket: {inspirations_bucket}")
 
     if local_brand_kit_dir and os.path.isdir(local_brand_kit_dir):
         count = _upload_brand_kit(client, brand_kit_bucket, local_brand_kit_dir)
         print(f"  Uploaded {count} files to bucket '{brand_kit_bucket}'")
 
-    return {"id": tenant_id, "brand_kit_bucket": brand_kit_bucket, "jobs_bucket": jobs_bucket}
+    if local_inspirations_dir and os.path.isdir(local_inspirations_dir):
+        count = _upload_flat(client, inspirations_bucket, local_inspirations_dir)
+        print(f"  Uploaded {count} files to bucket '{inspirations_bucket}'")
+
+    return {
+        "id": tenant_id,
+        "brand_kit_bucket": brand_kit_bucket,
+        "jobs_bucket": jobs_bucket,
+        "inspirations_bucket": inspirations_bucket,
+    }

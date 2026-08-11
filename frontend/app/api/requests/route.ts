@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
   const client = getServerSupabase();
   const { data, error } = await client
     .from("requests")
-    .select("id, campaign, copy, canvases, created_at")
+    .select("id, campaign, copy, canvases, inspirations, created_at")
     .eq("tenant_id", tenantId)
     .order("created_at", { ascending: false })
     .limit(limit);

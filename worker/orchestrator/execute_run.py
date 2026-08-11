@@ -269,6 +269,34 @@ def execute_claimed_run(run):
                     "png_path": f"{prefix}/{name}/render.png",
                 }, on_conflict="revision_id,canvas_name").execute()
             log(f"recorded {len(request['canvases'])} asset row(s)")
+
+            # DECISIONS.md SS3.2: "resolved - an edit run that named this
+            # comment in its prompt completed and produced the next
+            # revision." _hydrate_edit_context() (generation.py) always pulls
+            # EVERY open comment on the prior revision into the prompt, never
+            # a filtered subset - so "named in the prompt" is exactly "was
+            # open on the revision this run just produced the successor of."
+            # No agent-side reporting of which comments it addressed is
+            # needed; resolution is a pure function of which run succeeded
+            # against which prior revision.
+            if revision_number > 1:
+                prior_revision = (
+                    client.table("revisions")
+                    .select("id")
+                    .eq("request_id", request_id)
+                    .eq("revision_number", revision_number - 1)
+                    .single()
+                    .execute()
+                    .data
+                )
+                resolved = (
+                    client.table("comments")
+                    .update({"status": "resolved"})
+                    .eq("revision_id", prior_revision["id"])
+                    .eq("status", "open")
+                    .execute()
+                )
+                log(f"resolved {len(resolved.data)} comment(s) on prior revision {revision_number - 1}")
         else:
             client.table("revisions").update({"status": "failed"}).eq("id", revision_id).execute()
         client.table("runs").update(run_update).eq("id", run_id).execute()

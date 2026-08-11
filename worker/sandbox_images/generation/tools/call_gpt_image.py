@@ -25,7 +25,7 @@ reframing a plate into a *different* aspect ratio, which this isn't.
 
 REAL API BOUNDS (confirmed 2026-08-10 against developers.openai.com/api/docs
 /guides/image-generation directly, not an aggregator - see
-phase0/README.md finding #2b for the full writeup):
+DECISIONS.md SS6 for the full writeup):
   - max edge length <= 3840px
   - both edges must be multiples of 16px (matches what we'd already found
     empirically)

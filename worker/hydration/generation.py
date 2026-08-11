@@ -19,11 +19,13 @@ revision 3 after revision 4 failed is calling this again with
 revision_number=3. Same inputs, same outputs, no sandbox-specific state
 required anywhere (ROADMAP.md SS6).
 
-NOT yet implemented: fetching actual inspiration image files (the
-`inspirations` list is passed through in job/request.json, but the
-referenced files aren't fetched - there's no inspirations bucket yet, and
-no request has needed one tested end-to-end). Called out explicitly rather
-than silently doing nothing.
+Inspiration files named on the request (never the whole library - see
+SKILL.md's "consult one only when the request attaches it by filename") are
+fetched from that tenant's own inspirations_bucket into
+job/inspirations/<filename> - see _fetch_inspirations(). A named file that
+doesn't resolve becomes a .MISSING.txt placeholder, same posture as a
+missing prior-revision asset below: a finding for the agent to see, never a
+silent skip or a crash.
 
 Edit runs (revision_number > 1): the prior revision's assets (plate/
 overlay/render per canvas) plus any `open` comments left on it are pulled
@@ -164,6 +166,33 @@ def _hydrate_edit_context(client, tenant, request, revision_number):
     return extra_files, job_additions
 
 
+def _fetch_inspirations(client, tenant, filenames):
+    """Fetches ONLY the exact filenames a request names, from that tenant's
+    own inspirations_bucket - never the whole bucket. Matches SKILL.md:
+    'Consult one only when the request attaches it by filename. An
+    inspiration that merely sits in a directory is not selected and must
+    not influence the build.' Missing-file handling mirrors
+    _hydrate_edit_context()'s prior-revision-asset pattern: a placeholder
+    text file describing what's missing, not a silent skip or a crash."""
+    if not filenames:
+        return {}
+    bucket = tenant.get("inspirations_bucket")
+    files = {}
+    for filename in filenames:
+        if not bucket:
+            files[f"job/inspirations/{filename}.MISSING.txt"] = (
+                f"No inspirations_bucket set for this tenant - cannot fetch '{filename}'.".encode("utf-8")
+            )
+            continue
+        try:
+            files[f"job/inspirations/{filename}"] = client.storage.from_(bucket).download(filename)
+        except Exception as e:  # noqa: BLE001 - missing inspiration is a finding, not a crash
+            files[f"job/inspirations/{filename}.MISSING.txt"] = (
+                f"Expected inspiration '{filename}' in bucket '{bucket}', not found: {e}".encode("utf-8")
+            )
+    return files
+
+
 def hydrate_generation(tenant_id, request_id, revision_number):
     client = get_client()
 
@@ -207,6 +236,8 @@ def hydrate_generation(tenant_id, request_id, revision_number):
     brand_kit_files = _fetch_bucket_recursive(client, tenant["brand_kit_bucket"])
     for rel_path, data in brand_kit_files.items():
         files[f"brand_kit/{rel_path}"] = data
+
+    files.update(_fetch_inspirations(client, tenant, request["inspirations"]))
 
     job_context = {
         "request_id": request_id,

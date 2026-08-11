@@ -22,7 +22,7 @@ isolation evidence.
 Deferred: the edit half of section 5's scenario ("Kahua edits theirs",
 "Emplifi edits the first") - edit hydration doesn't exist yet (Phase 3
 territory, pulled forward only as far as a backend-only edit path if/when
-that's tackled next). See phase1.md.
+that's tackled next). See test_concurrency_edit.py, which covers this.
 
 This spends real Anthropic + OpenAI money across up to CAP simultaneous
 sandboxes - do not run without confirming first.

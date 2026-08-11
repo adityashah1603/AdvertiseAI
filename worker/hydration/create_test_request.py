@@ -72,7 +72,7 @@ TEST_REQUESTS = {
 }
 
 # Leaderboard (728x90) deliberately dropped from scope entirely (decision,
-# 2026-08-11, see phase1.md section 3): the real goal is Facebook/Instagram/
+# 2026-08-11, see DECISIONS.md section 6): the real goal is Facebook/Instagram/
 # TikTok compatibility, and a 728x90 IAB banner isn't a native placement on
 # any of those three anyway - not worth the architectural fight it would
 # take (gpt-image-2's 3:1 max ratio + total-pixel floor make it impossible

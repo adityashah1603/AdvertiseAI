@@ -88,6 +88,15 @@ export default function OnboardPage() {
           <input id="brand" name="brand" type="file" multiple />
         </div>
 
+        <div className="field">
+          <label htmlFor="inspirations">
+            Inspiration images — reference designs from this brand&apos;s own library, optional
+            (any number). Treatment reference only, per SKILL.md — never a source of color, type,
+            spacing, or copy.
+          </label>
+          <input id="inspirations" name="inspirations" type="file" multiple accept="image/*" />
+        </div>
+
         {error && <p className="error">{error}</p>}
 
         <button type="submit" disabled={submitting}>

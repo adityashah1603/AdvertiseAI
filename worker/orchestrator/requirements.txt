@@ -1,0 +1,13 @@
+# worker/orchestrator's own deps. `supabase` is deliberately NOT here -
+# execute_run.py/dispatcher.py/etc. reuse worker/hydration/.venv's
+# site-packages for it via a sys.path insert, rather than duplicating that
+# install (see execute_run.py's own comment on the import).
+#
+# e2b's pin here is load-bearing, not cosmetic: this venv previously had it
+# installed unpinned (no requirements.txt existed for this folder at all),
+# which silently drifted to 2.38.0 and broke sandbox_factory.py's
+# Sandbox.create() call - a major API-shape change from the 1.0.5 every
+# other reference in this repo assumes. Bump this pin deliberately, with a
+# verification pass against sandbox_factory.py, not by accident again.
+python-dotenv==1.2.2
+e2b==2.38.0

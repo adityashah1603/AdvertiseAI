@@ -9,7 +9,7 @@ export async function GET() {
   const client = getServerSupabase();
   const { data, error } = await client
     .from("tenants")
-    .select("id, slug, name, brand_kit_bucket, jobs_bucket, created_at")
+    .select("id, slug, name, brand_kit_bucket, jobs_bucket, inspirations_bucket, created_at")
     .order("name", { ascending: true });
 
   if (error) {
@@ -22,9 +22,10 @@ const SLUG_RE = /^[a-z0-9](?:[a-z0-9-]{0,58}[a-z0-9])?$/;
 
 // POST: the real "a brand-new company shows up" path. Accepts multipart
 // form data - a slug, a display name, one DESIGN.md file, any number of
-// font files, and any number of brand-asset files - and calls the exact
-// same onboardTenant() a CLI script would, so there is exactly one
-// onboarding implementation this endpoint exercises, not a parallel one.
+// font files, any number of brand-asset files, and any number of
+// inspiration image files - and calls the exact same onboardTenant() a CLI
+// script would, so there is exactly one onboarding implementation this
+// endpoint exercises, not a parallel one.
 export async function POST(req: NextRequest) {
   const form = await req.formData();
 
@@ -33,6 +34,7 @@ export async function POST(req: NextRequest) {
   const designMd = form.get("designMd");
   const fontFiles = form.getAll("fonts");
   const brandFiles = form.getAll("brand");
+  const inspirationFiles = form.getAll("inspirations");
 
   if (!SLUG_RE.test(slug)) {
     return NextResponse.json(
@@ -72,9 +74,20 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  const inspirations: UploadFile[] = [];
+  for (const f of inspirationFiles) {
+    if (f instanceof File) {
+      inspirations.push({
+        relPath: f.name,
+        data: new Uint8Array(await f.arrayBuffer()),
+        contentType: f.type || undefined,
+      });
+    }
+  }
+
   try {
     const client = getServerSupabase();
-    const tenant = await onboardTenant(client, slug, name, files);
+    const tenant = await onboardTenant(client, slug, name, files, inspirations);
     return NextResponse.json({ tenant }, { status: 201 });
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);

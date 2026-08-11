@@ -184,7 +184,7 @@ specific file failed, not discover it after everything else already ran.
 When every canvas is done, write ./output/RESULT.json summarizing what you
 built, any brand-data inconsistencies you found and how you resolved them,
 and anything you could not do and why - the same spirit as the findings
-already logged in phase0/README.md, but for this specific run. Upload it
+already logged in DECISIONS.md, but for this specific run. Upload it
 too, with output_key="RESULT.json".
 
 Some runs are EDITS to an ad that already exists, driven by human comments
@@ -246,6 +246,19 @@ requires regenerating it. Look at each final render before considering it
 done, the same as any other run.
 """
 
+    inspirations = job.get("inspirations") or []
+    if inspirations:
+        inspirations_block = "\n".join(f"  - job/inspirations/{f}" for f in inspirations) + (
+            "\n\nOpen these with your Read tool if you want to look at them. Per your "
+            "system prompt's skill contract: reference only - composition, rhythm, crop, "
+            "how the brand behaves on a canvas. Never sample a color from one, never "
+            "measure type off one, never copy its words, never extract or reuse any part "
+            "of it as an asset. A file suffixed .MISSING.txt means that named inspiration "
+            "could not be fetched - read the placeholder for why, then proceed without it."
+        )
+    else:
+        inspirations_block = "  (none attached)"
+
     return f"""New generation request.
 
 Campaign: {job['campaign']}
@@ -255,7 +268,8 @@ Copy:
 Canvases required:
 {canvases}
 
-Inspirations attached: {job['inspirations'] or 'none'}
+Inspirations attached:
+{inspirations_block}
 
 Generate a complete, on-brand ad for every canvas size listed above,
 following the skill contract in your system prompt. Look at each render

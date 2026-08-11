@@ -15,13 +15,14 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react";
-import { CANVAS_OPTIONS, type Canvas, type Copy, type Tenant } from "@/lib/types";
+import { CANVAS_OPTIONS, type Canvas, type Copy, type Inspiration, type Tenant } from "@/lib/types";
 
 type PastRequest = {
   id: string;
   campaign: string | null;
   copy: Copy;
   canvases: Canvas[];
+  inspirations: string[];
   created_at: string;
 };
 
@@ -68,6 +69,10 @@ export default function NewCampaignPage() {
     new Set(CANVAS_OPTIONS.map((c) => c.name))
   );
 
+  const [inspirations, setInspirations] = useState<Inspiration[]>([]);
+  const [inspirationsLoading, setInspirationsLoading] = useState(false);
+  const [selectedInspirations, setSelectedInspirations] = useState<Set<string>>(new Set());
+
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [uploadNotice, setUploadNotice] = useState<string | null>(null);
@@ -91,6 +96,19 @@ export default function NewCampaignPage() {
       .catch(() => setPastRequests([]));
   }, [tenantId]);
 
+  useEffect(() => {
+    if (!tenantId) {
+      setInspirations([]);
+      return;
+    }
+    setInspirationsLoading(true);
+    fetch(`/api/tenants/${tenantId}/inspirations`)
+      .then((r) => r.json())
+      .then((json) => setInspirations(json.inspirations ?? []))
+      .catch(() => setInspirations([]))
+      .finally(() => setInspirationsLoading(false));
+  }, [tenantId]);
+
   const activeTenant = useMemo(() => tenants.find((t) => t.id === tenantId), [tenants, tenantId]);
 
   function toggleCanvas(name: string) {
@@ -98,6 +116,15 @@ export default function NewCampaignPage() {
       const next = new Set(prev);
       if (next.has(name)) next.delete(name);
       else next.add(name);
+      return next;
+    });
+  }
+
+  function toggleInspiration(filename: string) {
+    setSelectedInspirations((prev) => {
+      const next = new Set(prev);
+      if (next.has(filename)) next.delete(filename);
+      else next.add(filename);
       return next;
     });
   }
@@ -123,6 +150,9 @@ export default function NewCampaignPage() {
     if (parsed.canvases && parsed.canvases.length > 0) {
       setSelectedCanvases(new Set(parsed.canvases.map((c) => c.name)));
     }
+    if (parsed.inspirations && parsed.inspirations.length > 0) {
+      setSelectedInspirations(new Set(parsed.inspirations));
+    }
   }
 
   async function onUploadRequestFile(e: ChangeEvent<HTMLInputElement>) {
@@ -146,6 +176,7 @@ export default function NewCampaignPage() {
     setCampaign(r.campaign ?? "");
     setCopy({ ...EMPTY_COPY, ...r.copy });
     setSelectedCanvases(new Set(r.canvases.map((c) => c.name)));
+    setSelectedInspirations(new Set(r.inspirations ?? []));
     setUploadNotice(`Loaded the setup from '${r.campaign ?? "a past request"}'.`);
     setStep(4);
   }
@@ -168,7 +199,7 @@ export default function NewCampaignPage() {
           campaign,
           copy: { ...copy, legal: copy.legal?.trim() ? copy.legal : null },
           canvases,
-          inspirations: [],
+          inspirations: Array.from(selectedInspirations),
         }),
       });
       const json = await res.json();
@@ -323,15 +354,61 @@ export default function NewCampaignPage() {
         <div className="card">
           <h2 style={{ marginTop: 0 }}>Choose inspiration</h2>
           <p className="muted">
-            Optional. This build tracks selected inspiration filenames on the request, but
-            hydration doesn&apos;t fetch them into the agent&apos;s sandbox yet (a known,
-            flagged gap — see phase1.md) — so skipping is honest, not a shortcut.
+            Optional — reference designs from {activeTenant?.name ?? "this brand"}&apos;s own
+            library. Treatment reference only, per SKILL.md: never a source of color, type,
+            spacing, or copy. Only the files you check here reach the agent&apos;s sandbox.
           </p>
+
+          {inspirationsLoading ? (
+            <p className="muted">Loading…</p>
+          ) : inspirations.length > 0 ? (
+            <div className="shortcut-grid">
+              {inspirations.map((insp) => {
+                const checked = selectedInspirations.has(insp.filename);
+                return (
+                  <label
+                    key={insp.filename}
+                    className={`shortcut-card ${checked ? "active" : ""}`}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => toggleInspiration(insp.filename)}
+                      style={{ position: "absolute", top: 8, left: 8 }}
+                    />
+                    {insp.url ? (
+                      <img
+                        src={insp.url}
+                        alt={insp.filename}
+                        style={{ width: "100%", height: 80, objectFit: "cover", borderRadius: 6 }}
+                      />
+                    ) : (
+                      <div style={{ height: 80, background: "var(--bg)" }} />
+                    )}
+                    <div className="title" style={{ fontSize: "0.75rem", wordBreak: "break-all" }}>
+                      {insp.filename}
+                    </div>
+                  </label>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="muted">
+              No inspiration images on file for this brand yet — nothing to attach. Skipping is
+              honest, not a shortcut.
+            </p>
+          )}
+
           <div className="wizard-actions">
             <button className="secondary" onClick={() => setStep(1)}>
               Back
             </button>
-            <button onClick={() => setStep(3)}>Skip / Continue</button>
+            <button onClick={() => setStep(3)}>
+              {selectedInspirations.size > 0
+                ? `Continue with ${selectedInspirations.size} selected`
+                : "Skip / Continue"}
+            </button>
           </div>
         </div>
       )}
@@ -443,6 +520,10 @@ export default function NewCampaignPage() {
             </dd>
             <dt>Canvases</dt>
             <dd>{Array.from(selectedCanvases).join(", ") || "—"}</dd>
+            <dt>Inspirations</dt>
+            <dd>
+              {selectedInspirations.size > 0 ? Array.from(selectedInspirations).join(", ") : "none attached"}
+            </dd>
           </dl>
 
           {error && <p className="error">{error}</p>}
