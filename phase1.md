@@ -252,3 +252,32 @@ fixed.
 4. When the real day-two brand shows up, run it through this exact
    pipeline unmodified — the actual test everything above has rehearsed
    for.
+
+---
+
+## 9. Frontend (`BUILD_GUIDE.md` Step 4)
+
+- **Built**: `frontend/` — Next.js App Router, brand onboarding
+  (upload DESIGN.md/fonts/brand assets → `onboardTenant()`, a TS port of
+  `onboarding.py` kept in lockstep by hand), campaign submission
+  (tenant picker populated live from `tenants`, never hardcoded), a
+  polling status/revision viewer, and a minimal edit/comment form.
+- **Two small worker changes this required**: `execute_run.py` now upserts
+  `assets` rows on success (previously unused table — the frontend needs
+  something to query for "what images exist"); `dispatcher.py` gained a
+  `--serve` flag to poll forever instead of drain-and-exit, for running as
+  an always-on worker behind a live UI.
+- **Architecture**: the Next.js API routes only ever insert/read Postgres
+  rows and mint signed Storage URLs — they never touch E2B/Anthropic/
+  OpenAI. The already-running `dispatcher.py --serve` process (separate
+  from `next dev`) is what actually claims and executes queued runs,
+  keeping disqualifier #3 intact (agent still only ever runs inside E2B,
+  reached only via a queue).
+- **To run**: `python worker/orchestrator/dispatcher.py --serve` in one
+  terminal (reads `GENERATION_CONCURRENCY_CAP` from `.env`), `npm run dev`
+  inside `frontend/` in another (needs `frontend/.env.local` with
+  `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY`, same values as root `.env`).
+- **Not built**: drag-to-pin comment UI (the edit form takes a canvas +
+  text only, not a region drawn on the image), inspiration file upload
+  (mirrors the existing hydration gap — filenames pass through, not
+  fetched).

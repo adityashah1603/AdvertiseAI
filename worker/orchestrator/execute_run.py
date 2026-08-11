@@ -51,10 +51,6 @@ SANDBOX_TIMEOUT_S = 900
 
 
 def execute_claimed_run(run):
-    # Imported here, not at module load, so enqueue-only callers (and the
-    # dispatcher's own claim loop) don't pay for/require the e2b import.
-    from e2b import Sandbox
-
     client = get_client()
     run_id = run["id"]
     tenant_id = run["tenant_id"]
@@ -65,52 +61,78 @@ def execute_claimed_run(run):
     def log(msg):
         print(f"[run {run_id}] {msg}")
 
-    tenant = client.table("tenants").select("*").eq("id", tenant_id).single().execute().data
-    request = client.table("requests").select("*").eq("id", request_id).single().execute().data
-    prefix = revision_prefix(request["campaign"], request_id, revision_number)
-
-    # The revisions row for (request_id, revision_number) always already
-    # exists by the time a run executes - the request/edit-creation step
-    # inserts it as 'pending' before any run is even enqueued (see
-    # create_test_request.py / create_test_edit.py). This run's job is to
-    # move that same row forward (generating -> ready/failed), never to
-    # insert a second one - "a revision" is the request/number pair, not
-    # any one run's attempt at it.
-    revision = (
-        client.table("revisions")
-        .select("id")
-        .eq("request_id", request_id)
-        .eq("revision_number", revision_number)
-        .single()
-        .execute()
-        .data
-    )
-    revision_id = revision["id"]
-    client.table("revisions").update({"status": "generating"}).eq("id", revision_id).execute()
-
-    # Written directly (this code already holds the service-role key for
-    # DB access, unlike the sandbox), not via a signed URL - purely an
-    # audit trail of WHY this attempt exists, alongside the canonical
-    # plate/overlay/render/RESULT.json this run is about to produce.
-    # Best-effort: a logging write failing should never fail the real run.
+    # FINDING (2026-08-11): a run that died on the `e2b` import (module not
+    # installed locally) was left stuck at status='running' forever -
+    # claim_next_run() counts status='running' rows against the concurrency
+    # cap, so an orphaned row like that silently eats capacity indefinitely.
+    # Root cause: the only code that ever wrote 'failed' back to the runs
+    # row was the except block below, but the try it belonged to used to
+    # start well after this point - after the e2b import, the tenant/
+    # request/revision fetch, and the revision->'generating' write. Any
+    # exception in that unprotected prefix propagated straight past this
+    # function, through dispatcher.py's own except (which only logs, on the
+    # assumption this file "already recorded it to the run row"), and the
+    # run row was never touched. revision_id is set only once the revision
+    # fetch below actually succeeds, and the except block accounts for it
+    # still being None.
+    revision_id = None
     try:
-        started_at = run.get("started_at") or datetime.now(timezone.utc).isoformat()
-        attempt_ts = started_at.replace(":", "-").split(".")[0]
-        run_short = run_id.split("-")[0]
-        attempt_path = f"{prefix}/attempts/{attempt_ts}-{run_short}-{reason}.json"
-        client.storage.from_(tenant["jobs_bucket"]).upload(
-            attempt_path,
-            json.dumps({
-                "run_id": run_id, "type": run.get("type"), "reason": reason,
-                "started_at": started_at,
-            }, indent=2).encode("utf-8"),
-            {"upsert": "true"},
+        # Imported here, not at module load, so enqueue-only callers (and
+        # the dispatcher's own claim loop) don't pay for/require the e2b
+        # import - and inside this try, so a missing/broken import is
+        # recorded as this run's failure instead of vanishing silently.
+        # See sandbox_factory.py for why sandbox creation itself goes
+        # through a shared helper rather than calling e2b directly here.
+        from sandbox_factory import create_sandbox
+
+        tenant = client.table("tenants").select("*").eq("id", tenant_id).single().execute().data
+        request = client.table("requests").select("*").eq("id", request_id).single().execute().data
+        prefix = revision_prefix(request["campaign"], request_id, revision_number)
+
+        # The revisions row for (request_id, revision_number) always already
+        # exists by the time a run executes - the request/edit-creation step
+        # inserts it as 'pending' before any run is even enqueued (see
+        # create_test_request.py / create_test_edit.py). This run's job is to
+        # move that same row forward (generating -> ready/failed), never to
+        # insert a second one - "a revision" is the request/number pair, not
+        # any one run's attempt at it.
+        revision = (
+            client.table("revisions")
+            .select("id")
+            .eq("request_id", request_id)
+            .eq("revision_number", revision_number)
+            .single()
+            .execute()
+            .data
         )
-        log(f"attempt logged: {attempt_path}")
-    except Exception as e:  # noqa: BLE001 - audit trail, never worth failing the run over
-        log(f"attempt log write failed (non-fatal): {e}")
+        revision_id = revision["id"]
+        client.table("revisions").update({"status": "generating"}).eq("id", revision_id).execute()
 
-    try:
+        # Written directly (this code already holds the service-role key for
+        # DB access, unlike the sandbox), not via a signed URL - purely an
+        # audit trail of WHY this attempt exists, alongside the canonical
+        # plate/overlay/render/RESULT.json this run is about to produce.
+        # Best-effort: a logging write failing should never fail the real run.
+        # Nested try/except (rather than sharing the outer one) so a failure
+        # here is swallowed as non-fatal instead of aborting the whole run -
+        # that scoping is exactly why this can't be the outer try itself.
+        try:
+            started_at = run.get("started_at") or datetime.now(timezone.utc).isoformat()
+            attempt_ts = started_at.replace(":", "-").split(".")[0]
+            run_short = run_id.split("-")[0]
+            attempt_path = f"{prefix}/attempts/{attempt_ts}-{run_short}-{reason}.json"
+            client.storage.from_(tenant["jobs_bucket"]).upload(
+                attempt_path,
+                json.dumps({
+                    "run_id": run_id, "type": run.get("type"), "reason": reason,
+                    "started_at": started_at,
+                }, indent=2).encode("utf-8"),
+                {"upsert": "true"},
+            )
+            log(f"attempt logged: {attempt_path}")
+        except Exception as e:  # noqa: BLE001 - audit trail, never worth failing the run over
+            log(f"attempt log write failed (non-fatal): {e}")
+
         log("hydrating (skill + this tenant's real brand kit + this job's copy)...")
         files = hydrate_generation(tenant_id, request_id, revision_number)
         log(f"{len(files)} files")
@@ -120,7 +142,7 @@ def execute_claimed_run(run):
         files["job/upload_urls.json"] = json.dumps(upload_urls).encode("utf-8")
 
         log("creating an anonymous E2B sandbox from the cq-generation-v1 template...")
-        sbx = Sandbox.create(template="cq-generation-v1", timeout=SANDBOX_TIMEOUT_S)
+        sbx = create_sandbox(template="cq-generation-v1", timeout=SANDBOX_TIMEOUT_S)
         log(f"sandbox_id: {sbx.sandbox_id}")
         client.table("runs").update({"sandbox_id": sbx.sandbox_id}).eq("id", run_id).execute()
 
@@ -228,6 +250,25 @@ def execute_claimed_run(run):
             client.table("revisions").update(
                 {"status": "ready", "run_id": run_id}
             ).eq("id", revision_id).execute()
+
+            # Index into the durable artifacts this run just produced - the
+            # assets table exists precisely so a caller (the frontend) can
+            # ask "what images exist for this revision" from Postgres
+            # without recomputing Storage paths itself. upsert on the
+            # existing (revision_id, canvas_name) unique constraint so a
+            # retry overwrites cleanly instead of erroring or duplicating.
+            for canvas in request["canvases"]:
+                name = canvas["name"]
+                client.table("assets").upsert({
+                    "revision_id": revision_id,
+                    "canvas_name": name,
+                    "width": canvas["width"],
+                    "height": canvas["height"],
+                    "plate_path": f"{prefix}/{name}/plate.png",
+                    "html_path": f"{prefix}/{name}/overlay.html",
+                    "png_path": f"{prefix}/{name}/render.png",
+                }, on_conflict="revision_id,canvas_name").execute()
+            log(f"recorded {len(request['canvases'])} asset row(s)")
         else:
             client.table("revisions").update({"status": "failed"}).eq("id", revision_id).execute()
         client.table("runs").update(run_update).eq("id", run_id).execute()
@@ -239,7 +280,11 @@ def execute_claimed_run(run):
         client.table("runs").update({
             "status": "failed", "error_message": str(e)[:2000], "ended_at": ended_at,
         }).eq("id", run_id).execute()
-        client.table("revisions").update({"status": "failed"}).eq("id", revision_id).execute()
+        # revision_id is only set once the revision fetch above succeeds -
+        # an earlier failure (e2b import, tenant/request/revision fetch)
+        # has no revision row to mark, only the run row.
+        if revision_id:
+            client.table("revisions").update({"status": "failed"}).eq("id", revision_id).execute()
         log(f"FAILED: {e}")
         raise
 

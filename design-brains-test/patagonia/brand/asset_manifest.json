@@ -1,0 +1,23 @@
+{
+  "brand_kit_id": "bk-patagonia-test-2026",
+  "assets": [
+    {
+      "kind": "logo",
+      "path": "brand/patagonia-logo.svg",
+      "brand_kit_id": "bk-patagonia-test-2026",
+      "notes": "Original placeholder wordmark - not Patagonia's real trademark. See DESIGN.md Provenance."
+    },
+    {
+      "kind": "logo_reverse",
+      "path": "brand/patagonia-logo-white.svg",
+      "brand_kit_id": "bk-patagonia-test-2026",
+      "notes": "For placement on the pine ground and on photography."
+    },
+    {
+      "kind": "logo_mark",
+      "path": "brand/patagonia-mark.svg",
+      "brand_kit_id": "bk-patagonia-test-2026",
+      "notes": "Original placeholder mark - not Patagonia's real trademark. See DESIGN.md Provenance."
+    }
+  ]
+}

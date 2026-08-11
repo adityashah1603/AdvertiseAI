@@ -96,7 +96,8 @@ def main():
         api_key=os.environ["E2B_API_KEY"],
     )
     print(f"\nBuild complete: {build_info}")
-    print(f"\nUse this template in Sandbox.create(template='{TEMPLATE_ALIAS}')")
+    print(f"\nUse this template via create_sandbox(template='{TEMPLATE_ALIAS}') "
+          "(worker/orchestrator/sandbox_factory.py)")
 
 
 if __name__ == "__main__":

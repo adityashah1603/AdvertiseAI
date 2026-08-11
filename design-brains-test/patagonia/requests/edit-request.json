@@ -1,0 +1,19 @@
+{
+  "kind": "edit",
+  "tenant_slug": "patagonia",
+  "campaign": "Public Lands Petition",
+  "comments": [
+    {
+      "canvas_name": "square",
+      "region": { "x": 120, "y": 880, "width": 300, "height": 80 },
+      "body": "Check the CTA button corners are perfectly square, not rounded - this brand never rounds anything, cards or buttons.",
+      "author": "operator@patagonia.example"
+    },
+    {
+      "canvas_name": "landscape",
+      "region": { "x": 80, "y": 340, "width": 500, "height": 60 },
+      "body": "Subhead reads a little soft for this brand's voice - tighten it to one direct clause, no filler, matching the headline's plainness.",
+      "author": "operator@patagonia.example"
+    }
+  ]
+}

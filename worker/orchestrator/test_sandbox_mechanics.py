@@ -10,9 +10,10 @@ after this) reuses the same e2b.Sandbox calls verified here, but with
 agent_runner.py as the command instead of a `find`/checksum probe.
 
 Constraint notes:
-  - No tenant-identifying metadata is passed to Sandbox.create() - the
-    sandbox is anonymous, exactly as the disqualifiers require. Its id
-    (printed below) is whatever opaque string E2B issues.
+  - No tenant-identifying metadata is passed to create_sandbox()
+    (sandbox_factory.py) - the sandbox is anonymous, exactly as the
+    disqualifiers require. Its id (printed below) is whatever opaque
+    string E2B issues.
   - The only things read back from the sandbox here are command
     stdout/stderr from a diagnostic probe (a file listing and a checksum),
     not any agent's creative output - there is no agent and no creative
@@ -26,11 +27,15 @@ import os
 import sys
 
 from dotenv import load_dotenv
-from e2b import Sandbox
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 load_dotenv(os.path.join(ROOT, ".env"))
 sys.path.insert(0, os.path.join(ROOT, "worker", "hydration"))
+
+# Same shared helper execute_run.py uses - see sandbox_factory.py. This
+# script used to call `Sandbox.create(...)` directly, a second independent
+# call site carrying the exact same broken-API bug found in execute_run.py.
+from sandbox_factory import create_sandbox  # noqa: E402
 
 # worker/hydration's own venv has `supabase` installed; this venv doesn't
 # yet - reuse that one's site-packages rather than duplicating the install.
@@ -53,7 +58,7 @@ def main():
     local_skill_md_hash = hashlib.sha256(files["skill/SKILL.md"]).hexdigest()
 
     print("Creating a fresh E2B sandbox (no tenant-identifying metadata)...")
-    sbx = Sandbox.create(timeout=120)
+    sbx = create_sandbox(timeout=120)
     print(f"  sandbox_id: {sbx.sandbox_id}  <- opaque, provider-issued, not a tenant/task name\n")
 
     try:

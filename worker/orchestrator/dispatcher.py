@@ -79,7 +79,15 @@ def _run_and_report(run):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python dispatcher.py <concurrency_cap>")
+    # --serve: run forever, polling for new work as it's submitted (what a
+    # live frontend needs behind it) instead of draining once and exiting
+    # (what the one-off manual/test invocations of this script have always
+    # wanted). Same run_dispatcher() either way - only whether it stops once
+    # the queue empties differs.
+    args = [a for a in sys.argv[1:] if a != "--serve"]
+    serve = "--serve" in sys.argv
+    if len(args) > 1:
+        print("Usage: python dispatcher.py [concurrency_cap] [--serve]")
         sys.exit(1)
-    run_dispatcher(int(sys.argv[1]))
+    cap = int(args[0]) if args else int(os.environ.get("GENERATION_CONCURRENCY_CAP", 2))
+    run_dispatcher(cap, drain=not serve)

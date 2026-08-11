@@ -1,0 +1,20 @@
+{
+  "kind": "new",
+  "tenant_slug": "patagonia",
+  "campaign": "Public Lands Petition",
+  "copy": {
+    "eyebrow": "Take Action",
+    "headline": "A new bill opens protected wilderness to mining leases",
+    "subhead": "The vote is in 90 days. Tell your senator no.",
+    "cta": "Sign the petition",
+    "cta_href": "https://patagonia.example/public-lands",
+    "legal": null
+  },
+  "canvases": [
+    { "name": "square", "width": 1080, "height": 1080 },
+    { "name": "landscape", "width": 1200, "height": 628 },
+    { "name": "portrait", "width": 1080, "height": 1350 },
+    { "name": "story", "width": 1080, "height": 1920 }
+  ],
+  "inspirations": []
+}

@@ -45,8 +45,13 @@ def run_generation(tenant_id, request_id, revision_number):
     return execute_claimed_run(run)
 
 
-if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print("Usage: python run_generation.py <tenant_id> <request_id> <revision_number>")
-        sys.exit(1)
-    run_generation(sys.argv[1], sys.argv[2], int(sys.argv[3]))
+# Disabled as a direct entrypoint - this path bypasses claim_next_run()'s
+# concurrency cap entirely (see the module docstring), which is fine for a
+# one-off manual test but not something that should be runnable by accident
+# outside that context. run_generation() itself is left in place/importable
+# for that same manual-testing use case.
+# if __name__ == "__main__":
+#     if len(sys.argv) != 4:
+#         print("Usage: python run_generation.py <tenant_id> <request_id> <revision_number>")
+#         sys.exit(1)
+#     run_generation(sys.argv[1], sys.argv[2], int(sys.argv[3]))
