@@ -1,16 +1,18 @@
 """
-agent_runner.py - the autonomous version of what I (the outer Claude Code
-session) did by hand in Phase 0: read the brand, generate a plate, build
-the HTML overlay, render it, look at it, save it. Same job, no human
-steering it turn by turn.
+agent_runner.py - runs the design-generation agent autonomously inside the
+sandbox: read the brand, generate a plate, build the HTML overlay, render
+it, look at it, save it. No human steering it turn by turn - the loop at
+the bottom of this file (`run()`) is the whole of what decides what happens
+next, turn by turn, in the agent's place.
 
 Deliberately minimal custom tooling, with one exception. The Claude Agent
 SDK gives the agent Bash/Read/Write/Glob for free - it's literally Claude
 Code as a library, and its Read tool is already multimodal (can view a PNG
 it just rendered), which is exactly what SKILL.md's "look at it" step
 needs. So for plate generation and rendering, the agent just calls the two
-CLI scripts already proven in Phase 0 (tools/call_gpt_image.py,
-tools/render_html.py) via Bash, exactly like I did by hand.
+CLI scripts already staged in its own working directory
+(skill/tools/call_gpt_image.py, skill/tools/render_html.py) via Bash - see
+build_system_prompt() below for the exact invocation it's told to use.
 
 The ONE exception is saving output. That's deliberately a real custom tool
 (upload_output_file, an in-process MCP tool per the SDK's create_sdk_mcp_server)

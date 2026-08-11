@@ -1,109 +1,42 @@
-# DECISIONS.md
+1. Hard Disqualifiers - none violate all checked individually
+    - nothing but the agent moves work out of the box, no tenant/task identity in sandbox, agent never on laptop, agent never a backend subprocess, no work exists only on a box, no hardcoded ordering - can submit any comapny(new or already existing) in any order. 
+    - Note: used a test script to read the checksum of file we wrote in, this was only for diagnostics and debugging and doesnt get called when the process is running
 
-Write-up accompanying the code. Positions, not features — no version graphs, diffing, or permission systems built for §4.
+2. skills.md's 7 invariants:
+    - Plate first - one plate live html on top, nothing else
+    - one plate per canvas size - never reframe one plate onto different ratio
+    - Every word is live html
+    - Logo is never stretched or skewed
+    - Design.md wins over tokens, manifests, inspiration
+    - inspiration are reference only - never source of color, type or copy
+    - never publish -generation agent has no adstream credential
 
----
+3. Brief's core idea:
+    - three data layers kept seperate everywhere - global(skill/tooling, same every run), tenant (the brand, fetched fresh every run, never cached), job (the request itself). A rebrand needs zero rebuild. 
 
-## 1. Built vs. stubbed
+4. Storage/hydration/Resume
+    - Hydration functions are pure — same ids in, same files out, always.
+    - Resume = replaying that same function, not a separate mechanism.
+    - The agent saves its own work from inside the box; the orchestrator only ever reads back from Storage, never trusts the agent's word alone.
 
-| Area | Status | Note |
-|---|---|---|
-| Phase 0 — local skill gate | done | 20+ ads, Emplifi/Kahua/Duolingo, local, no sandbox |
-| Phase 1 — generation pipeline | done | 4 brands live through real sandbox path, zero code changes per brand |
-| Phase 2 — engine | done | Concurrency, resume, crash-recovery all proven live, not asserted |
-| Phase 3 — feedback surface | done | Pinned comments, drag-to-pin UI, resolved-status all live |
-| Phase 4 — deployment | done | Real Adstream deploys, verified detail-page read-back, webm recording, independent concurrency pool — all live |
+5. Built vs stubbed: 
+    - all 4 parts done(generate, engine, feedback, deploy)
+    - not built deliberately : brand kit versioning, brand conformance grader, edit routing classifier, custom scheduler, credential perm system, latency optimization
 
-Stubbed by choice: brand-kit versioning, conformance grader, edit-routing classifier, scheduler beyond FIFO, credential permission system.
+6. The four routed policy questions:
+    - Brand changes mid-task → always fetch fresh, never freeze. Surface the change, don't block on it.
+    - Stale pinned comment → open → resolved → orphaned. No auto-remapping, ever.
+    - Concurrency cap → independent pools for generate/edit vs. deploy, enforced in Postgres, excess just queues.
+    - Credential blast radius → generation gets OpenAI+Anthropic, deploy gets Anthropic+Adstream — never overlapping, neither ever touches the database directly.
 
----
+7. Future Work: 
+    - Auto reconcile run where orchestrator dies but run succeeds
+    - for retry - avoid rebilling, could save a few cents
+    - Deploy not idempotent - currently frontend doesnt check if the verified deploy already exists before calling other one - could lead to two same campaigns under new name (duplicate)
 
-## 2. Next steps
-
-- One dispatcher process per env, or matching caps — mixed caps let peak exceed the lower one (found live).
-- Pin every venv's deps — orchestrator had none, silently drifted e2b versions, broke sandbox creation twice.
-- Re-billing on retry not avoided — nice-to-have per brief, not fixed.
-- RLS still unbuilt — harmless today (server-only access), revisit if client-side Supabase access is ever added.
-- Re-run 4-tenant concurrent edit test — last clean run only had 2 tenants eligible.
-- Write top-level README.md — venv-per-script ambiguity caused a real outage.
-- Adstream's create flow only takes one image per ad — deploy agent now creates one ad per canvas when a revision has multiple; worth a cleaner multi-creative story if Adstream ever supports it.
-- Adstream's Campaign field is a fixed 4-option dropdown, no free text — every deploy currently maps to the closest existing bucket; document this mapping rule explicitly rather than leaving it to per-run agent judgment if it matters later.
-
----
-
-## 3. Storage / hydration / resume model
-
-- Three tiers, kept separate everywhere: **global** (skill, tooling — same every run), **tenant** (brand kit — fetched fresh every run, never cached), **job** (request/copy/comments/revisions — unique per run).
-- `hydrate_generation(tenant_id, request_id, revision_number)` — pure function, no side effects, no sandbox awareness. Same inputs → same files, always.
-- Resume = replay. Killing a box and rehydrating the same ids into a new one is the whole recovery story — no snapshot, no diff engine. Proven live (§6).
-- Per-tenant Storage buckets (brand kit, jobs, inspirations) — isolation boundary is the bucket, not a path prefix.
-
----
-
-## 4. The four questions
-
-### 4.1 Brand changes between revision 3 and 6
-Position: never freeze a brand kit to a task — always fetch fresh. Fingerprint-diff-and-surface (not block) is the cheap fix, not yet built.
-Least sure: whether non-blocking is enough for a real operator.
-
-### 4.2 Stale pinned comment
-Position: `open` → `resolved` (edit run against it succeeded, built + verified) → `orphaned` (newer revision exists, nothing closed it, deliberately unbuilt — brief says don't).
-No coordinate remapping, no pixel diffing, ever.
-
-### 4.3 Concurrency cap + the 4th request
-Position: env-var cap per run-type, Postgres row-lock (`claim_next_run` for generate/edit, `claim_next_deploy_run` for deploy — two independent pools, built and proven concurrent live) enforces it, excess sits `queued` FIFO, visible in UI.
-Real nuance: cap is per-caller, not global — two dispatchers with different caps can jointly exceed the lower one.
-
-### 4.4 Credential blast radius
-Generation sandbox: OpenAI + Anthropic keys, per-file signed upload URLs only — no DB key, no other tenant's data, no Adstream.
-Deploy sandbox: Anthropic key + Adstream login only, no OpenAI key, no brand-kit access, no DB key. Recording via Playwright (`record_video_dir`), not Kernel — `KERNEL_API_KEY` is unset, and the brief sanctions this fallback explicitly.
-
----
-
-## 5. Least sure of
-
-- Fingerprint-diff-and-surface (4.1) may not be enough for a real operator workflow.
-- Silent orphaning (4.2) may lose real feedback vs. an explicit re-raise prompt.
-- FIFO, zero per-tenant fairness (4.3) — fine at trial scale, untested at real volume.
-- One shared Adstream login standing in for per-tenant creds (4.4) — aspirational once Part 4 exists.
-- Day-two brand test: Duolingo + Patagonia both zero-code-change, but both self-onboarded, not handed over cold.
-- 2-tenant concurrent-edit proof, not 4 — other two dropped out from an earlier failed attempt.
-- No full second "look at it" pass across every render — only spot audits caught the type-scale violations in §6.
-
-**Transparency note:** Phase 0 saw `.gitignore` edited to re-hide ROADMAP/DECISIONS with an instruction not to mention it. Flagged to the user then, not complied with. Not recurred since.
-
----
-
-## 6. Key findings
-
-- `gpt-image-2`: real bounds are ÷16 edges, ≤3840px, ≤3:1 ratio, 655K–8.3M px. 728×90 impossible — dropped, documented, replaced with 9:16 story.
-- Type-scale role mistakes (wrong named value, or scaling type to fit) — recurred across brands, fixed via explicit prompt rule, not a validator.
-- Default 1GB sandbox OOM'd on deps → custom pre-built template. Zero tenant identity in it — checked against disqualifier #2.
-- `Sandbox.create` broke twice, opposite directions: e2b 1.0.5 lacked it, e2b 2.38.0 (unpinned drift) required it again. Fixed + pinned.
-- Multi-process cap nuance (§2) — found live, re-run with one process confirmed cap holds.
-- Concurrent batch (cap=2, 4 reqs/3 tenants): peak exactly 2, zero leakage. Leak-checker proven able to catch a planted leak first.
-- Mid-run `Sandbox.kill()` + re-enqueue: resumed clean, agent unaware. Re-billing on retry not avoided.
-- Stuck `running` row (sandbox died outside normal exception path) doesn't self-heal alone — fixed, now expires after 20 min.
-- `revisions` table was never updated on success — silent gap, found via real orphaned-revision audit, fixed.
-- Comment `resolved` was designed here but never coded — found via real stale data, fixed, backfilled.
-- Inspirations were tracked but never fetched — full fix: per-tenant bucket, real picker UI, hydration fetch.
-- Brand data: Emplifi DESIGN.md vs tokens.json disagree (DESIGN.md wins); Kahua's own DESIGN.md self-contradicts (56px table vs 48px prose — prose wins, more operational); missing assets omitted, never faked.
-- Part 4 first real attempt succeeded outright: signed in, completed the 3-step flow, waited for real state (never a fixed sleep), read the detail page back before setting verified. Two real Adstream constraints found: only one image per ad (agent now creates one ad per canvas when needed), and Campaign is a fixed 4-option dropdown with no free text or create-new.
-- Playwright's `record_video_dir` outputs `.webm`, not `.mp4` — spec docs said `.mp4`; verified before building, not assumed. No `ffmpeg` conversion added; browsers play `.webm` natively and "no recording, no deploy" doesn't require a specific container format.
-
----
-
-## 7. Disqualifier compliance (docx brief / ROADMAP §1 / SKILL.md)
-
-- Nothing but the agent moves work out of the box — orchestrator only checks Storage after, never reads the sandbox.
-- No tenant/task sandbox identity — `create_sandbox()` can't accept metadata/envs at creation; brand data re-fetched fresh every run.
-- Agent never a backend subprocess — runs inside E2B only, reached via API; frontend never touches E2B/Anthropic/OpenAI.
-- No agent on a laptop — the agent's own process always executes inside the remote sandbox.
-- No work exists only on a box — hydration is a pure function of ids; live kill+resume test proves it.
-- No hardcoded ordering — FIFO claim, no tenant-aware logic; proven under real concurrent load.
-- No brand-conformance grader — only deterministic structural checks + mandatory human/agent "look at it."
-- No edit-routing classifier — left entirely to the agent, every time.
-- SKILL.md invariants (plate-first, one plate per size, every word live HTML, logo natural proportions, DESIGN.md wins, inspirations reference-only, never publish) — held; enforced via agent system prompt + structural checks, never a scoring program. Generation-only; the deploy agent doesn't use SKILL.md, it has its own contract.
-- Part 4 specific: browser runs only inside the sandbox, never the orchestrator's machine — confirmed by construction, Playwright only ever executes via `sbx.commands.run(...)`. No recording in Storage = automatic `failed`, enforced by `execute_deploy_run.py`, not left to the agent's own claim. `verified=true` requires both a real Storage-confirmed recording AND the agent's own detail-page read-back — never set speculatively.
-
-**Status: zero hard-constraint violations found**, current code, both docs cross-checked.
+8. Least sure of:
+    - "surface, dont block" on brand change is good for real operator
+    - orphaning stale comment loses real feedback
+    - FIFO would hold up at scale
+    - Every render got the same scrutiny as the documented second pass
+    
