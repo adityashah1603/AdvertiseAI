@@ -1,7 +1,7 @@
 // Mirrors supabase/migrations/0001_init.sql + 0004_comments.sql +
-// 0007_inspirations_bucket.sql + 0008_deploys.sql + 0010_deploy_canvas_name.sql
-// exactly - this file has no independent opinion about the schema, it just
-// names it for the TypeScript side.
+// 0007_inspirations_bucket.sql + 0008_deploys.sql + 0010_deploy_canvas_name.sql +
+// 0011_cancel_requested.sql exactly - this file has no independent opinion
+// about the schema, it just names it for the TypeScript side.
 
 export type Tenant = {
   id: string;
@@ -78,6 +78,7 @@ export type Run = {
   ended_at: string | null;
   created_at: string;
   reason: string | null;
+  cancel_requested: boolean;
 };
 
 export type Asset = {

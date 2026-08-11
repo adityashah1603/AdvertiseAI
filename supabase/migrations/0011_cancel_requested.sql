@@ -1,0 +1,13 @@
+-- "Stop" button support: the frontend can never call E2B directly (it only
+-- ever writes Postgres rows, same trust boundary as every other route), so
+-- stopping a run is a two-step handoff, not a direct kill:
+--   1. Frontend sets cancel_requested=true on the run row.
+--   2. The orchestrator - which already polls the sandbox every ~15s for
+--      metrics while waiting on the agent - checks this same flag on the
+--      same cadence, and if set, kills the sandbox itself (it already
+--      holds the E2B credential; nothing else needs to).
+-- The actual kill path this triggers is the exact one already proven live
+-- twice tonight (a deliberate generation-run kill, a deliberate deploy-run
+-- mid-session kill) - this migration only adds the trigger, not new kill
+-- behavior.
+alter table runs add column cancel_requested boolean not null default false;

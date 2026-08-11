@@ -163,9 +163,24 @@ def execute_claimed_deploy_run(run):
             wait_thread = threading.Thread(target=_wait_for_agent, daemon=True)
             wait_thread.start()
 
+            # "Stop" button support - see execute_run.py's identical block
+            # for the full reasoning. Same trust boundary, same proven kill
+            # path (already tested live, deliberately, on a deploy run
+            # specifically).
+            stopped_by_operator = False
             while wait_thread.is_alive():
                 wait_thread.join(timeout=15)
                 if wait_thread.is_alive():
+                    try:
+                        cancel_row = client.table("runs").select("cancel_requested").eq("id", run_id).single().execute().data
+                        if cancel_row and cancel_row.get("cancel_requested"):
+                            log("cancel_requested=true - stopping by operator request...")
+                            stopped_by_operator = True
+                            sbx.kill()
+                            break
+                    except Exception as e:
+                        log(f"[cancel check] fetch failed (non-fatal): {e}")
+
                     try:
                         metrics = sbx.get_metrics()
                         if metrics:
@@ -175,6 +190,9 @@ def execute_claimed_deploy_run(run):
                                 f"mem={m.mem_used / 1e6:.0f}MB/{m.mem_total / 1e6:.0f}MB ({mem_pct:.0f}%)")
                     except Exception as e:
                         log(f"[metrics] fetch failed: {e}")
+
+            if stopped_by_operator:
+                raise RuntimeError("stopped by operator request")
 
             if "error" in wait_outcome:
                 err = wait_outcome["error"]

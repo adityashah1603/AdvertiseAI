@@ -52,6 +52,7 @@ export default function RequestDetailPage() {
   const [editError, setEditError] = useState<string | null>(null);
   const [deploySubmitting, setDeploySubmitting] = useState(false);
   const [deployError, setDeployError] = useState<string | null>(null);
+  const [stoppingRunId, setStoppingRunId] = useState<string | null>(null);
 
   const imgRef = useRef<HTMLImageElement>(null);
   const dragStart = useRef<{ x: number; y: number } | null>(null);
@@ -233,6 +234,27 @@ export default function RequestDetailPage() {
     }
   }
 
+  async function submitStop(runId: string) {
+    setStoppingRunId(runId);
+    try {
+      const res = await fetch(`/api/requests/${requestId}/stop`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ run_id: runId }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "stop failed");
+      // Not marked failed instantly - the orchestrator only checks
+      // cancel_requested on its own ~15s poll cadence, so keep polling
+      // rather than assuming it already happened.
+      restartPolling();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setStoppingRunId(null);
+    }
+  }
+
   function submitDraftComment() {
     if (!draftRegion || !selectedCanvas || !commentBody.trim()) return;
     postComments([{ canvas_name: selectedCanvas, region: draftRegion, body: commentBody, author: "ui" }]);
@@ -365,10 +387,22 @@ export default function RequestDetailPage() {
           {run ? (
             <>
               <span className={`status-pill status-${run.status}`}>{run.status}</span>
-              {run.status === "running" && run.sandbox_id && (
-                <p className="muted mono" style={{ marginTop: "0.5rem" }}>
-                  sandbox: {run.sandbox_id}
-                </p>
+              {run.status === "running" && (
+                <>
+                  {run.sandbox_id && (
+                    <p className="muted mono" style={{ marginTop: "0.5rem" }}>
+                      sandbox: {run.sandbox_id}
+                    </p>
+                  )}
+                  <button
+                    className="secondary"
+                    style={{ marginTop: "0.5rem" }}
+                    onClick={() => submitStop(run.id)}
+                    disabled={stoppingRunId === run.id || run.cancel_requested}
+                  >
+                    {run.cancel_requested ? "Stopping…" : stoppingRunId === run.id ? "Stopping…" : "Stop"}
+                  </button>
+                </>
               )}
               {run.status === "failed" && run.error_message && (
                 <p className="error" style={{ marginTop: "0.5rem" }}>{run.error_message}</p>
@@ -408,6 +442,16 @@ export default function RequestDetailPage() {
                     last deploy attempt: {deployRun.canvas_name ?? "(unknown canvas)"}
                   </p>
                   <span className={`status-pill status-${deployRun.status}`}>{deployRun.status}</span>
+                  {deployRun.status === "running" && (
+                    <button
+                      className="secondary"
+                      style={{ marginLeft: "0.5rem" }}
+                      onClick={() => submitStop(deployRun.id)}
+                      disabled={stoppingRunId === deployRun.id || deployRun.cancel_requested}
+                    >
+                      {deployRun.cancel_requested || stoppingRunId === deployRun.id ? "Stopping…" : "Stop"}
+                    </button>
+                  )}
                   {deployRun.status === "failed" && deployRun.error_message && (
                     <p className="error" style={{ marginTop: "0.5rem" }}>{deployRun.error_message}</p>
                   )}
