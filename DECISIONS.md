@@ -71,6 +71,12 @@ attempt (§6) and weren't re-generated fresh just to pad the number.
 7. **The concurrent-edit test's 4-tenant proof is incomplete** (§1) — worth
    re-running with all 4 tenants freshly eligible for a fuller version of
    "the horrifying test case"'s edit half.
+8. **Write the top-level `README.md`** (`BUILD_GUIDE.md` Step 8, not yet
+   done) with the exact run command per subsystem, explicitly naming which
+   `.venv` each one needs — `python worker/orchestrator/dispatcher.py --serve`
+   is ambiguous about which `python` and caused a real, live
+   `e2b`-version-mismatch failure (§6) when run via the global interpreter
+   instead of `worker/orchestrator/.venv`, which is pinned correctly.
 
 ---
 
