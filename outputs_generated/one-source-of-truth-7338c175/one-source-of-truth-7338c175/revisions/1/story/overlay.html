@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face { font-family: "Barlow"; src: url("assets/barlow_400_normal.ttf") format("truetype"); font-weight: 400; }
+  @font-face { font-family: "Barlow"; src: url("assets/barlow_500_normal.ttf") format("truetype"); font-weight: 500; }
+  @font-face { font-family: "Barlow"; src: url("assets/barlow_600_normal.ttf") format("truetype"); font-weight: 600; }
+  @font-face { font-family: "Barlow"; src: url("assets/barlow_700_normal.ttf") format("truetype"); font-weight: 700; }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  #canvas {
+    position: relative;
+    width: 1080px;
+    height: 1920px;
+    overflow: hidden;
+    font-family: "Barlow", sans-serif;
+  }
+
+  #canvas img.plate {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1080px;
+    height: 1920px;
+    display: block;
+  }
+
+  .overlay-text {
+    position: absolute;
+  }
+
+  .logo-card {
+    position: absolute;
+    left: 64px;
+    top: 64px;
+    width: 206px;
+    height: 94px;
+    background: #FFFFFF;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-card img {
+    max-width: 170px;
+    max-height: 58px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+  }
+
+  .eyebrow {
+    left: 64px;
+    top: 198px;
+    width: 600px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #F26B21;
+  }
+
+  .headline {
+    left: 64px;
+    top: 230px;
+    width: 610px;
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: #FFFFFF;
+  }
+
+  .subhead {
+    left: 64px;
+    top: 420px;
+    width: 560px;
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.55;
+    color: rgba(255,255,255,0.88);
+  }
+
+  .stat-number {
+    left: 64px;
+    top: 1660px;
+    width: 500px;
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1;
+    color: #F26B21;
+  }
+
+  .stat-label {
+    left: 64px;
+    top: 1722px;
+    width: 500px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.85);
+  }
+</style>
+</head>
+<body>
+  <div id="canvas">
+    <img class="plate" src="plate.png" alt="">
+
+    <div class="logo-card" data-cq-role="logo">
+      <img src="assets/kahua-logo.svg" alt="Kahua">
+    </div>
+
+    <div class="overlay-text eyebrow" data-cq-role="text">Capital Program Management</div>
+
+    <div class="overlay-text headline" data-cq-role="text">One platform.<br>One source of truth.</div>
+
+    <div class="overlay-text subhead" data-cq-role="text">Stop reconciling Oracle, SAP, Workday and spreadsheets across every project.</div>
+
+    <div class="overlay-text stat-number" data-cq-role="text">$400B+</div>
+    <div class="overlay-text stat-label" data-cq-role="text">Managed on platform</div>
+  </div>
+</body>
+</html>

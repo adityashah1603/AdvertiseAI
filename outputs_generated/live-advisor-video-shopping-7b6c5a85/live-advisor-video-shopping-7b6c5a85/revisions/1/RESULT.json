@@ -1,0 +1,72 @@
+{
+  "status": "completed",
+  "campaign": "Live Advisor Video Shopping",
+  "brand_kit_id": "bk-emplifi-2026",
+  "canvases": [
+    {
+      "name": "square",
+      "width": 1080,
+      "height": 1080,
+      "plate": "output/square/plate.png",
+      "overlay": "output/square/overlay.html",
+      "render": "output/square/render.png"
+    },
+    {
+      "name": "landscape",
+      "width": 1200,
+      "height": 628,
+      "plate": "output/landscape/plate.png",
+      "overlay": "output/landscape/overlay.html",
+      "render": "output/landscape/render.png"
+    },
+    {
+      "name": "portrait",
+      "width": 1080,
+      "height": 1350,
+      "plate": "output/portrait/plate.png",
+      "overlay": "output/portrait/overlay.html",
+      "render": "output/portrait/render.png"
+    },
+    {
+      "name": "story",
+      "width": 1080,
+      "height": 1920,
+      "plate": "output/story/plate.png",
+      "overlay": "output/story/overlay.html",
+      "render": "output/story/render.png"
+    }
+  ],
+  "build_summary": {
+    "plate_source": "New textless, logo-free full-canvas plates generated per canvas at exact target dimensions via gpt-image-2 (call_gpt_image.py), each depicting a navy ground with periwinkle circle/arc geometry framing a real smartphone product-grid UI mockup with a small live-video bubble in the lower portion of the canvas, and a fully quiet navy zone reserved for text.",
+    "overlay": "One fixed-canvas root per size, single full-canvas plate image, and live HTML/CSS text nodes (data-cq-role=text/logo/cta) for eyebrow, headline, subhead and CTA, plus the emplifi reverse (white) logo SVG placed at natural aspect ratio via a constrained wrapper with object-fit:contain.",
+    "fonts": "Inter 400/500/600/700 loaded via @font-face from brand_kit/fonts/*.ttf; no browser fallback used.",
+    "type_scale_usage": {
+      "headline": "h1 48px (all 4 canvases, unchanged)",
+      "subhead": "body 16px (all 4 canvases, unchanged)",
+      "eyebrow": "caption 13px (all 4 canvases, unchanged)",
+      "cta_label": "body 16px (short label text, not scaled up or down to fit any canvas)"
+    },
+    "layout_per_canvas": "Text block position/width was adjusted per canvas to fit the quiet region of that canvas's plate (e.g. story places the CTA near the bottom third to suit a vertical, thumb-scroll format while landscape keeps the whole block in a narrower left column) - no font size was ever changed to make copy fit."
+  },
+  "brand_data_inconsistencies_found": [
+    {
+      "artifact": "brand/tokens.json",
+      "issue": "tokens.json lists secondary #5B5BD6, h1 56px, and radii [16px], all of which disagree with DESIGN.md (secondary #6765FE, h1 48px, border-radius 12px with pill CTAs). Per invariant 5, DESIGN.md is the brand.",
+      "resolution": "Used DESIGN.md's values throughout: #6765FE for the periwinkle accent/eyebrow, h1 at 48px for every headline, and fully-rounded pill CTAs per the Shape section's explicit CTA rule. tokens.json was not read as a source of any value."
+    },
+    {
+      "artifact": "brand/asset_manifest.json",
+      "issue": "Manifest includes a 'logo_lockup' entry (partner-lockup.svg) tagged brand_kit_id 'bk-kahua-2026', which does not match this request's brand (Emplifi, bk-emplifi-2026).",
+      "resolution": "Not used, per the brand-binding rule that only manifest assets whose brand_kit_id matches the pinned kit may be placed. Used emplifi-logo-white.svg (kit bk-emplifi-2026) instead, since all four plates place the logo on a navy/photographic ground."
+    },
+    {
+      "artifact": "job/inspirations/emplifi-live-video.png",
+      "issue": "The inspiration's CTA is a solid orange filled pill, which conflicts with DESIGN.md's explicit rule that orange is reserved for the CTA and is never used as a fill (a CTA is an orange label inside a 2px orange outline on navy).",
+      "resolution": "Treated the inspiration as composition/rhythm reference only (per invariant 6): kept its general layout idea (headline block over a photo/UI element framed by periwinkle circles and a thin connecting line, in the lower half) but built the CTA as DESIGN.md specifies - an orange outlined, unfilled pill label - not a filled button."
+    }
+  ],
+  "could_not_do": [
+    "None - all four requested canvases (square, landscape, portrait, story) were built with every required copy string live as HTML text, the Emplifi reverse logo placed at its natural aspect ratio, and a DESIGN.md-compliant CTA. No brief/legal copy was supplied in the request, so no brief or legal line was added."
+  ],
+  "notes": "Not published or deployed anywhere; this run only stages the files above."
+}

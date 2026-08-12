@@ -1,0 +1,78 @@
+{
+  "status": "completed",
+  "campaign": "2026 Gartner Leader",
+  "brand_kit_id": "bk-emplifi-2026",
+  "canvases": [
+    {
+      "name": "square",
+      "width": 1080,
+      "height": 1080,
+      "plate": "output/square/plate.png",
+      "overlay": "output/square/overlay.html",
+      "render": "output/square/render.png"
+    },
+    {
+      "name": "landscape",
+      "width": 1200,
+      "height": 628,
+      "plate": "output/landscape/plate.png",
+      "overlay": "output/landscape/overlay.html",
+      "render": "output/landscape/render.png"
+    },
+    {
+      "name": "portrait",
+      "width": 1080,
+      "height": 1350,
+      "plate": "output/portrait/plate.png",
+      "overlay": "output/portrait/overlay.html",
+      "render": "output/portrait/render.png"
+    },
+    {
+      "name": "story",
+      "width": 1080,
+      "height": 1920,
+      "plate": "output/story/plate.png",
+      "overlay": "output/story/overlay.html",
+      "render": "output/story/render.png"
+    }
+  ],
+  "what_was_built": "One textless/logo-free navy-ground plate per canvas (generated via gpt-image-2, each at the exact target pixel size), each depicting an abstract periwinkle geometric motif (soft-filled circles of varying sizes joined by thin arcs/a connecting line) confined to a clearly-bounded zone of the frame so a full quiet zone remains for the live HTML overlay. Overlay HTML for every canvas places, as real selectable text/DOM nodes: eyebrow ('Analyst Recognition'), h1 headline ('A Leader in Gartner's 2026 Magic Quadrant'), body subhead, a pill-shaped outlined CTA ('Read the report', a real <a href> to the given cta_href), the Gartner legal line, and the emplifi-logo-white.svg reverse logo placed at its natural 324:96 ratio inside a constraining box (object-fit: contain, no stretch). All four canvases use identical font sizes for every role (h1 48px / body 16px / caption 13px, per DESIGN.md's type scale) - only container widths, left margins and vertical offsets differ per aspect ratio, per the anti-scaling invariant. Fonts loaded from brand_kit/fonts/*.ttf via @font-face (Inter 400/600/700), no browser fallback.",
+  "brand_data_inconsistencies_found": [
+    {
+      "field": "type_scale.h1",
+      "design_md": "48px",
+      "tokens_json_cache": "56px",
+      "resolution": "Used DESIGN.md's 48px for every h1 headline on every canvas, per invariant 5 (DESIGN.md always wins over the tokens.json cache)."
+    },
+    {
+      "field": "palette.secondary",
+      "design_md": "#6765FE",
+      "tokens_json_cache": "#5B5BD6",
+      "resolution": "Used DESIGN.md's #6765FE (matches the color actually baked into the shipped logo SVGs) for the eyebrow text, the CTA-adjacent periwinkle geometry in the plate, and generation prompts. Ignored the tokens.json value."
+    },
+    {
+      "field": "asset_manifest brand_kit_id mismatch",
+      "detail": "brand/asset_manifest.json lists partner-lockup.svg under brand_kit_id 'bk-kahua-2026', a different kit from the rest of the manifest ('bk-emplifi-2026'). This campaign is unambiguously Emplifi's own (DESIGN.md, copy, cta_href all point to emplifi.example), so per the brand-binding rule only assets tagged bk-emplifi-2026 were eligible. partner-lockup.svg was not used anywhere.",
+      "resolution": "Used emplifi-logo-white.svg (kind: logo_reverse, bk-emplifi-2026, explicitly noted for placement on the navy ground) as the sole logo asset, at its natural 324x96 (3.375:1) proportions."
+    }
+  ],
+  "deviations_and_why": [
+    {
+      "issue": "DESIGN.md's 'Applying it' section describes periwinkle geometric shapes framing 'a photo or a product surface in the lower half'. No photo or product-UI asset was supplied anywhere in the brand kit or the request (copy.brief is null, and the asset manifest contains only logo files, no photography or product screenshots).",
+      "what_was_done": "Rather than fabricate a fake product screenshot or dashboard via the image model (which risks garbled UI-like text/numbers baked into the plate - explicitly prohibited) or borrow imagery from nowhere, the plate uses the brand's own geometric vocabulary alone - the periwinkle circles/arcs/connecting-line motif that is otherwise used to *frame* a photo - as the entire visual subject, arranged as a self-contained abstract cluster. This keeps every token, shape language and color choice on-brand while honestly reflecting that no product-surface asset existed to frame.",
+      "escalation": "If a real product-UI screenshot or campaign photography exists for this Gartner-recognition placement, it should be supplied for a future revision so the plate can foreground it per DESIGN.md's stated preference for real product surfaces over abstract illustration."
+    }
+  ],
+  "structural_checks": {
+    "canvas_dimensions_exact": true,
+    "plate_uniform_scale_fills_canvas": true,
+    "plate_text_logo_cta_free": true,
+    "all_copy_strings_present_as_overlay": true,
+    "no_overlay_overlap": true,
+    "logo_aspect_ratio_preserved": true,
+    "all_assets_resolve_in_project": true,
+    "fonts_loaded_from_brand_kit": true
+  },
+  "visual_review_notes": "Rendered PNGs were opened and inspected for all four canvases. Headline reads first and largest in every canvas; subhead and legal sit on flat, unbroken navy so they never compete with the periwinkle graphic; the CTA (orange text in a 2px orange pill outline, no fill) is the clear next click and matches DESIGN.md's CTA rule exactly. The reverse (white) logo holds up on the navy ground at the size used. Worst thing about this set: because no product/photo asset existed, the plate is purely decorative brand geometry rather than a concrete product or analyst-report visual, so the ad leans more 'recognition badge' than 'proof point' - it would read stronger with an actual Magic Quadrant graphic or product screenshot once one is available. A very faint horizontal tonal seam is visible in the story plate around y=1550 (an artifact of gpt-image-2's non-16-multiple upscale/downscale step in call_gpt_image.py); it sits inside the plate's own graphic band, doesn't touch any text, and is not noticeable at normal viewing size, so it was left as-is rather than regenerated at the cost of another API call.",
+  "not_done": "Did not publish or deploy anything; only staged files under output/<canvas>/ and this RESULT.json, per invariant 6."
+}

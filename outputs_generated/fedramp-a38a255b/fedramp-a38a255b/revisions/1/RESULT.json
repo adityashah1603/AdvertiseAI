@@ -1,0 +1,52 @@
+{
+  "status": "completed",
+  "campaign": "fedRAMP",
+  "brand_kit_id": "bk-kahua-2026",
+  "canvases": [
+    {
+      "name": "square",
+      "width": 1080,
+      "height": 1080,
+      "plate": "output/square/plate.png",
+      "overlay": "output/square/overlay.html",
+      "render": "output/square/render.png"
+    },
+    {
+      "name": "landscape",
+      "width": 1200,
+      "height": 628,
+      "plate": "output/landscape/plate.png",
+      "overlay": "output/landscape/overlay.html",
+      "render": "output/landscape/render.png"
+    }
+  ],
+  "copy_used": {
+    "eyebrow": "COMPLIANCE",
+    "headline": "FedRAMP certified. 70,000+ projects.",
+    "subhead": "Cleared for defense contractors and public-sector capital programs.",
+    "cta": null,
+    "legal": null
+  },
+  "copy_derivation_note": "job/request.json shipped every copy field (eyebrow, headline, subhead, cta, legal) as an empty string / null, with only the free-text brief describing a 'stat-led ad: FedRAMP certified. 70K+ projects.' aimed at defense contractors and public-sector capital programs. I wrote the actual copy from that brief in Kahua's plain, confident, no-adjectives voice: headline uses the brief's stat verbatim ('FedRAMP certified. 70,000+ projects.'), eyebrow is a short category label ('COMPLIANCE') rather than repeating 'FedRAMP' right above the headline, and subhead names the audience the brief called out. Because cta and cta_href were both blank, I did not invent a CTA button or label — this is a trust/awareness stat ad with no action requested, not an omission.",
+  "type_scale_used": {
+    "headline": "48px (h1, per DESIGN.md 'Applying it' prose: 'An h1 is 48px on every canvas' — held at exactly 48px on both the square and landscape canvas, not scaled up or down for available space)",
+    "subhead": "17px (body)",
+    "eyebrow": "14px (caption), Barlow 600, letterspaced, accent color, per DESIGN.md 'Applying it'"
+  },
+  "brand_data_inconsistencies_found": [
+    {
+      "issue": "DESIGN.md's 'Type scale' table lists h1: 56px, but the binding 'Applying it' prose beneath it states 'An h1 is 48px on every canvas. If the headline does not fit at 48, cut the copy; do not scale the type.' These two numbers directly conflict inside the same document.",
+      "resolution": "Treated the explicit, instructional prose (48px, with a stated no-scaling rule) as the more specific and more authoritative statement for how h1 is actually used in an ad, and used 48px on every canvas. brand/tokens.json also states h1: 56px, but tokens.json has no authority per the skill contract, so it did not factor into the decision either way."
+    },
+    {
+      "issue": "DESIGN.md and brand/tokens.json both name 'Barlow Condensed' as the heading family, but brand_kit/fonts/ only ships four regular-width Barlow weights (400/500/600/700 normal) — no condensed variant file exists anywhere in the brand kit.",
+      "resolution": "Used Barlow 700 (the boldest shipped weight) for the headline, set at the mandated 48px with tight (-0.3px) letter-spacing, rather than falling back to a browser/system condensed font. This keeps the headline on an actual shipped brand file per invariant 4/'fonts from brain' rule, at the cost of not literally being condensed. Flagging this as a brand-kit gap rather than something I could silently fix."
+    },
+    {
+      "issue": "brand/asset_manifest.json lists a 'logo_reverse' asset at brand/kahua-logo-white.svg (for placement on dark grounds), but that file does not exist in brand_kit/brand/ — only kahua-logo.svg (dark ink + orange mark) and kahua-mark.svg (mark only) are actually present on disk.",
+      "resolution": "Per invariant ('a path is not an asset'), treated logo_reverse as unavailable and did not use it. Designed both plates so the logo sits on a genuinely light, photographed concrete/panel area of the scene (not a synthetic dark overlay), so the real dark kahua-logo.svg reads correctly at full contrast without needing the missing reverse file. Did not attempt to recolor or fabricate a white version of the logo."
+    }
+  ],
+  "what_i_could_not_do": "Could not include a CTA element because the request supplied no CTA label or href — correct behavior per invariant 3 (never typeset copy that wasn't given) rather than an escalation-worthy gap, since this is a stat-led trust ad rather than a click-through ad.",
+  "notes": "Both plates are full-bleed, textless, logo-free documentary photographs of a federal/civic construction site at dusk (per DESIGN.md: 'Photography is jobsite-real, never stock-office'), each generated with a genuine photographed light concrete zone sized for the overlay so text and the logo sit on calm, high-contrast ground rather than over the busiest part of the photo. All headline/subhead/eyebrow text and the logo are live HTML/SVG overlays per the contract; nothing campaign-related is baked into the raster plates. Looked at both final renders at actual size before finishing: headline reads first and clearly from a distance, logo holds up on its ground, composition matches Kahua's plain/operational tone, and no CTA is present or implied where none was requested."
+}

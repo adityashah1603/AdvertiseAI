@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  @font-face {
+    font-family: "Barlow";
+    src: url("assets/barlow_400_normal.ttf") format("truetype");
+    font-weight: 400;
+  }
+  @font-face {
+    font-family: "Barlow";
+    src: url("assets/barlow_600_normal.ttf") format("truetype");
+    font-weight: 600;
+  }
+  @font-face {
+    font-family: "Barlow";
+    src: url("assets/barlow_700_normal.ttf") format("truetype");
+    font-weight: 700;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 1200px;
+    height: 628px;
+    overflow: hidden;
+  }
+
+  #canvas {
+    position: relative;
+    width: 1200px;
+    height: 628px;
+    overflow: hidden;
+    background: #1B3A5C;
+    font-family: "Barlow", sans-serif;
+  }
+
+  #plate {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1200px;
+    height: 628px;
+    object-fit: cover;
+    display: block;
+  }
+
+  [data-cq-role="text"] {
+    position: absolute;
+    left: 64px;
+    width: 600px;
+  }
+
+  .eyebrow {
+    top: 76px;
+    font-family: "Barlow", sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #F26B21;
+  }
+
+  .headline {
+    top: 108px;
+    font-family: "Barlow", sans-serif;
+    font-weight: 700;
+    font-size: 48px;
+    line-height: 1.08;
+    letter-spacing: -0.3px;
+    color: #FFFFFF;
+    width: 580px;
+  }
+
+  .subhead {
+    top: 322px;
+    font-family: "Barlow", sans-serif;
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 1.5;
+    color: rgba(255,255,255,0.88);
+    width: 540px;
+  }
+
+  [data-cq-role="logo"] {
+    position: absolute;
+    left: 64px;
+    top: 500px;
+    width: 168px;
+    height: 64px;
+    background: #FFFFFF;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+  }
+
+  [data-cq-role="logo"] img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+  }
+</style>
+</head>
+<body>
+  <div id="canvas">
+    <img id="plate" src="plate.png" alt="" />
+
+    <div class="eyebrow" data-cq-role="text">INTRODUCING KAHUA AI</div>
+
+    <div class="headline" data-cq-role="text">Ask Noa where the change order stands.</div>
+
+    <div class="subhead" data-cq-role="text">
+      Noa retrieves records and automates the busywork inside Kahua &mdash;
+      built for PMs buried in RFIs and submittals.
+    </div>
+
+    <div data-cq-role="logo">
+      <img src="assets/kahua-logo.svg" alt="Kahua" />
+    </div>
+  </div>
+</body>
+</html>

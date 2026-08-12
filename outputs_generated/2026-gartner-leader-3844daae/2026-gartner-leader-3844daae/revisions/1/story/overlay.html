@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face {
+    font-family: 'Inter';
+    font-weight: 400;
+    src: url('../../brand_kit/fonts/inter_400_normal.ttf') format('truetype');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-weight: 500;
+    src: url('../../brand_kit/fonts/inter_500_normal.ttf') format('truetype');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-weight: 600;
+    src: url('../../brand_kit/fonts/inter_600_normal.ttf') format('truetype');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-weight: 700;
+    src: url('../../brand_kit/fonts/inter_700_normal.ttf') format('truetype');
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:1080px; height:1920px; }
+  #canvas {
+    position: relative;
+    width: 1080px;
+    height: 1920px;
+    overflow: hidden;
+    background: #0C3B5D;
+    font-family: 'Inter', sans-serif;
+  }
+  #canvas img.plate {
+    position: absolute;
+    top: 0; left: 0;
+    width: 1080px;
+    height: 1920px;
+    display: block;
+  }
+  .logo {
+    position: absolute;
+    top: 150px;
+    left: 72px;
+    height: 47px;
+    width: 160px;
+  }
+  .logo img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+  }
+  .eyebrow {
+    position: absolute;
+    top: 221px;
+    left: 72px;
+    width: 620px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    color: #6765FE;
+  }
+  .headline {
+    position: absolute;
+    top: 249px;
+    left: 72px;
+    width: 620px;
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1.15;
+    color: #FFFFFF;
+  }
+  .subhead {
+    position: absolute;
+    top: 379px;
+    left: 72px;
+    width: 560px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.55;
+    color: #94A9B8;
+  }
+  .cta {
+    position: absolute;
+    top: 473px;
+    left: 72px;
+    display: inline-flex;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: #FF5A21;
+    border: 2px solid #FF5A21;
+    border-radius: 999px;
+    padding: 14px 30px;
+    text-decoration: none;
+    background: transparent;
+  }
+  .legal {
+    position: absolute;
+    top: 1830px;
+    left: 72px;
+    width: 800px;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.45;
+    color: #94A9B8;
+  }
+</style>
+</head>
+<body>
+  <div id="canvas">
+    <img class="plate" src="plate.png" alt="">
+    <div class="logo" data-cq-role="logo">
+      <img src="../../brand_kit/brand/emplifi-logo-white.svg" alt="Emplifi">
+    </div>
+    <div class="eyebrow" data-cq-role="text">Analyst Recognition</div>
+    <div class="headline" data-cq-role="text">A Leader in Gartner&#39;s 2026 Magic Quadrant</div>
+    <div class="subhead" data-cq-role="text">Social Media Management and Listening, ranked by the people who evaluate vendors for a living.</div>
+    <a class="cta" data-cq-role="cta" href="https://emplifi.example/gartner-2026">Read the report</a>
+    <div class="legal" data-cq-role="text">Gartner does not endorse any vendor, product or service depicted in its research publications.</div>
+  </div>
+</body>
+</html>

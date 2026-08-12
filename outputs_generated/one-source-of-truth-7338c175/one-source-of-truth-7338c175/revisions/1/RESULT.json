@@ -1,0 +1,61 @@
+{
+  "status": "completed",
+  "campaign": "one source of truth",
+  "brand_kit_id": "bk-kahua-2026",
+  "canvases": [
+    {
+      "name": "landscape",
+      "width": 1200,
+      "height": 628,
+      "plate": "landscape/plate.png",
+      "overlay": "landscape/overlay.html",
+      "render": "landscape/render.png"
+    },
+    {
+      "name": "story",
+      "width": 1080,
+      "height": 1920,
+      "plate": "story/plate.png",
+      "overlay": "story/overlay.html",
+      "render": "story/render.png"
+    }
+  ],
+  "copy_used": {
+    "eyebrow": "Capital Program Management",
+    "headline": "One platform. One source of truth.",
+    "subhead": "Stop reconciling Oracle, SAP, Workday and spreadsheets across every project.",
+    "stat_number": "$400B+",
+    "stat_label": "Managed on platform",
+    "cta": null,
+    "legal": null
+  },
+  "copy_decisions": [
+    "job/request.json shipped empty strings for eyebrow/headline/subhead/cta and cta_href, with the actual brief in copy.brief. Per that brief, wrote the headline verbatim from the customer's own line ('One platform. One source of truth.'), added an eyebrow ('Capital Program Management') and a subhead naming the exact systems called out in the brief (Oracle, SAP, Workday, spreadsheets), and split the required hard stat into a large number ('$400B+') plus a caption label ('Managed on platform').",
+    "cta and cta_href were both empty strings and the brief describes this as a stat/awareness placement, not a click-through ask, so no CTA was fabricated and none is present on either canvas. This is a deliberate omission, not an oversight."
+  ],
+  "brand_data_inconsistencies_found": [
+    {
+      "issue": "DESIGN.md's '## Type scale' table lists h1: 56px, but the '## Applying it' prose says explicitly: 'An h1 is 48px on every canvas. If the headline does not fit at 48, cut the copy; do not scale the type.' These two numbers directly contradict each other inside the same source-of-truth document.",
+      "resolution": "Used 48px for the headline on both canvases. The prose rule is the more specific, operational instruction (it names the exact failure mode this run was warned against: scaling h1 per canvas), and tokens.json mirrors the 56px table value exactly, which is consistent with it being a stale/duplicated cache value rather than the deliberately-authored applied rule. Flagging this as a real conflict for brand-doc cleanup rather than silently picking one."
+    },
+    {
+      "issue": "DESIGN.md's heading font is stated as 'Barlow Condensed', and tokens.json repeats that. brand_kit/fonts/ ships no Barlow Condensed file at all -- only barlow_400_normal.ttf, barlow_500_normal.ttf, barlow_600_normal.ttf and barlow_700_normal.ttf (the non-condensed family).",
+      "resolution": "Used Barlow 700 (the shipped bold weight of the regular family) for all headline/heading text instead of a browser-substituted condensed font. Did not reach for a system/Google-Fonts 'Barlow Condensed' fallback, per the no-browser-fallback rule. This is a real asset gap in the brand kit, not a stylistic choice -- flagging for the brand kit to add the actual Barlow Condensed files."
+    },
+    {
+      "issue": "brand/asset_manifest.json lists a 'logo_reverse' asset at brand/kahua-logo-white.svg 'for placement on photography and any ground darker than #6B7A88', but no such file exists in brand_kit/brand/ -- only kahua-logo.svg (dark ink wordmark) and kahua-mark.svg are present.",
+      "resolution": "Never recoloured or redrew the logo to fabricate a reverse version. Instead placed the real kahua-logo.svg only where it reads legibly at full contrast: directly on the light sky patch in the landscape plate (top-right), and inside a small white, 4px-radius surface card in the story plate (top-left), where the underlying photo is dark navy. No logo pixel was altered."
+    }
+  ],
+  "what_could_not_be_done": "No brand-approved reverse/white logo file exists, so a logo could not be placed directly on the darkest parts of either plate without a backing card (used only on the story canvas). No Barlow Condensed font file exists, so headings render in Barlow (non-condensed) 700 instead of the brand's specified condensed cut. Both are asset gaps in brand_kit, not something this run can safely fix by regenerating or recolouring brand assets.",
+  "structural_checks": {
+    "canvas_dimensions_exact": true,
+    "plate_uniform_scale_fullbleed": true,
+    "plate_free_of_text_logo_cta": true,
+    "all_required_copy_present_as_overlay": true,
+    "logo_natural_aspect_preserved": true,
+    "all_fonts_from_brand_kit": true,
+    "font_size_role_mapping": "h1=48px used only for the headline; caption=14px used only for eyebrow and stat label; body=17px used only for subhead. No h2/h3 substituted for body. Same 48px h1 size used on both canvases (not scaled up or down per canvas)."
+  },
+  "look_review_notes": "Reviewed both final render.png files at actual size. Landscape: headline is the first thing the eye lands on against the dark tilt-up concrete wall, subhead and stat read clearly beneath it, logo is legible on the open sky pocket top-right, and the busy crane/crew action stays clear of all copy. Story: same hierarchy top-to-bottom -- logo card, eyebrow, headline and subhead sit on the calm sky, the $400B+ stat sits alone on the calm foreground concrete near the bottom, and the crane/crew action fills the uncluttered middle without colliding with any text. No CTA is present on either canvas because none was requested. Weakest point: the gap between subhead and the sky/crane action on the story canvas is a little inert; acceptable given no further copy was supplied to fill it, and adding invented copy would have violated the brief."
+}

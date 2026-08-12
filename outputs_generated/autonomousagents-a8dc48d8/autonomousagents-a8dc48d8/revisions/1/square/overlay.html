@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face {
+    font-family: 'Inter';
+    src: url('assets/inter_400_normal.ttf') format('truetype');
+    font-weight: 400;
+  }
+  @font-face {
+    font-family: 'Inter';
+    src: url('assets/inter_500_normal.ttf') format('truetype');
+    font-weight: 500;
+  }
+  @font-face {
+    font-family: 'Inter';
+    src: url('assets/inter_600_normal.ttf') format('truetype');
+    font-weight: 600;
+  }
+  @font-face {
+    font-family: 'Inter';
+    src: url('assets/inter_700_normal.ttf') format('truetype');
+    font-weight: 700;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1080px; height: 1080px; }
+  #canvas {
+    position: relative;
+    width: 1080px;
+    height: 1080px;
+    overflow: hidden;
+    background: #0C3B5D;
+    font-family: 'Inter', sans-serif;
+  }
+  #canvas img.plate {
+    position: absolute;
+    top: 0; left: 0;
+    width: 1080px; height: 1080px;
+    display: block;
+  }
+  .logo-wrap {
+    position: absolute;
+    top: 64px;
+    left: 64px;
+    width: 148px;
+    height: 44px;
+  }
+  .logo-wrap img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+  }
+  .eyebrow {
+    position: absolute;
+    top: 172px;
+    left: 64px;
+    width: 700px;
+    font-size: 13px;
+    line-height: 1.4;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #6765FE;
+  }
+  .headline {
+    position: absolute;
+    top: 204px;
+    left: 64px;
+    width: 700px;
+    font-size: 48px;
+    line-height: 1.15;
+    font-weight: 700;
+    color: #FFFFFF;
+  }
+  .subhead {
+    position: absolute;
+    top: 332px;
+    left: 64px;
+    width: 660px;
+    font-size: 16px;
+    line-height: 1.55;
+    font-weight: 400;
+    color: #94A9B8;
+  }
+</style>
+</head>
+<body>
+  <div id="canvas">
+    <img class="plate" src="plate.png" alt="">
+    <div class="logo-wrap" data-cq-role="logo">
+      <img src="assets/emplifi-logo-white.svg" alt="Emplifi">
+    </div>
+    <div class="eyebrow" data-cq-role="text">AUTONOMOUS AGENTS</div>
+    <div class="headline" data-cq-role="text">Agents work.<br>Humans approve.</div>
+    <div class="subhead" data-cq-role="text">AI agents handle publishing, discovery, and routing. Humans keep full oversight and approval on every action.</div>
+  </div>
+</body>
+</html>

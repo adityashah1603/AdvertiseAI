@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face {
+    font-family: "Inter";
+    src: url("../../brand_kit/fonts/inter_400_normal.ttf") format("truetype");
+    font-weight: 400;
+  }
+  @font-face {
+    font-family: "Inter";
+    src: url("../../brand_kit/fonts/inter_500_normal.ttf") format("truetype");
+    font-weight: 500;
+  }
+  @font-face {
+    font-family: "Inter";
+    src: url("../../brand_kit/fonts/inter_600_normal.ttf") format("truetype");
+    font-weight: 600;
+  }
+  @font-face {
+    font-family: "Inter";
+    src: url("../../brand_kit/fonts/inter_700_normal.ttf") format("truetype");
+    font-weight: 700;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1080px; height: 1350px; overflow: hidden; }
+  body { font-family: "Inter", sans-serif; }
+  #canvas {
+    position: relative;
+    width: 1080px;
+    height: 1350px;
+    overflow: hidden;
+  }
+  #plate {
+    position: absolute;
+    top: 0; left: 0;
+    width: 1080px;
+    height: 1350px;
+    display: block;
+  }
+  .logo-wrap {
+    position: absolute;
+    top: 72px;
+    left: 72px;
+    width: 210px;
+    height: 62px;
+  }
+  .logo-wrap img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+  }
+  .eyebrow {
+    position: absolute;
+    top: 176px;
+    left: 72px;
+    width: 800px;
+    font-size: 13px;
+    line-height: 1.2;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #6765FE;
+  }
+  .headline {
+    position: absolute;
+    top: 212px;
+    left: 72px;
+    width: 880px;
+    font-size: 48px;
+    line-height: 1.15;
+    font-weight: 700;
+    color: #FFFFFF;
+  }
+  .subhead {
+    position: absolute;
+    top: 420px;
+    left: 72px;
+    width: 600px;
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 400;
+    color: #94A9B8;
+  }
+  .cta {
+    position: absolute;
+    top: 512px;
+    left: 72px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 30px;
+    border: 2px solid #FF5A21;
+    border-radius: 999px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #FF5A21;
+    text-decoration: none;
+    letter-spacing: 0.01em;
+  }
+</style>
+</head>
+<body>
+  <div id="canvas">
+    <img id="plate" src="plate.png" alt="">
+
+    <div class="logo-wrap" data-cq-role="logo">
+      <img src="../../brand_kit/brand/emplifi-logo-white.svg" alt="Emplifi">
+    </div>
+
+    <div class="eyebrow" data-cq-role="text">Live Advisor</div>
+
+    <div class="headline" data-cq-role="text">Put a real expert on every product page</div>
+
+    <div class="subhead" data-cq-role="text">Live video shopping turns browsers into buyers, no app switch required.</div>
+
+    <a class="cta" data-cq-role="cta" href="https://emplifi.example/live-advisor">See Live Advisor</a>
+  </div>
+</body>
+</html>

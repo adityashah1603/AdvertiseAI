@@ -1,0 +1,89 @@
+{
+  "status": "completed",
+  "campaign": "AutonomousAgents",
+  "brand_kit_id": "bk-emplifi-2026",
+  "summary": "Built four plate-first ads (square 1080x1080, landscape 1200x628, portrait 1080x1350, story 1080x1920) for the Emplifi autonomous-agents/governance campaign. Each canvas has its own textless, logo-free full-bleed plate (deep navy ground, periwinkle circle/arc/connecting-line framing motif, a light abstract product-surface panel styled as a routing/approval workflow UI - content cards, toggle switches, avatar circles, connector arrows, checkmarks, no readable words/numbers/logos anywhere in the plate) plus a live HTML overlay carrying every word and the reverse (white) Emplifi logo.",
+  "copy_authored": {
+    "note": "job/request.json shipped every copy field (headline, subhead, eyebrow, cta, cta_href) as an empty string. The brief described the campaign's message in prose but supplied no literal strings to place, so copy was authored here directly from the brief rather than left blank or invented off-brief.",
+    "eyebrow": "AUTONOMOUS AGENTS",
+    "headline": "Agents work. Humans approve.",
+    "subhead": "AI agents handle publishing, discovery, and routing. Humans keep full oversight and approval on every action.",
+    "cta": "Intentionally omitted. cta and cta_href were both explicitly empty strings in the request (not just unset), which was read as a deliberate signal for an awareness/governance message with no click-through ask this round, not as a gap to fill with an invented label/link. No CTA element was added to any overlay."
+  },
+  "type_scale_applied": {
+    "headline": "h1 - 48px / Inter 700, identical across all four canvases (never scaled up or down to fit a canvas)",
+    "subhead": "body - 16px / Inter 400, identical across all four canvases",
+    "eyebrow": "caption - 13px / Inter 600, uppercase, 0.14em tracking, identical across all four canvases",
+    "note": "Fit issues per canvas were solved by repositioning the text block and choosing a 1- vs 2-line headline break, never by changing font-size or substituting h2/h3 for body."
+  },
+  "brand_data_inconsistencies": [
+    {
+      "field": "secondary color",
+      "design_md": "#6765FE",
+      "tokens_json": "#5B5BD6",
+      "resolution": "Used DESIGN.md's #6765FE (also matches the color actually baked into the shipped logo SVGs) for the periwinkle shapes and the eyebrow color. tokens.json is a brand-sync cache with no authority per the skill contract and was not used."
+    },
+    {
+      "field": "h1 size",
+      "design_md": "48px",
+      "tokens_json": "56px",
+      "resolution": "Used DESIGN.md's 48px for the headline on every canvas."
+    },
+    {
+      "field": "border-radius",
+      "design_md": "12px (CTA pill-shaped)",
+      "tokens_json": "16px",
+      "resolution": "Not directly exercised this run since no CTA button was built, but flagged for consistency; DESIGN.md would win if a CTA radius were needed."
+    },
+    {
+      "field": "asset_manifest partner lockup",
+      "issue": "brand/asset_manifest.json includes a 'logo_lockup' entry (partner-lockup.svg) tagged brand_kit_id 'bk-kahua-2026', which does not match this run's brand kit 'bk-emplifi-2026' (the id on every other manifest entry and on the manifest's top-level field).",
+      "resolution": "Not used. Only emplifi-logo-white.svg (brand_kit_id bk-emplifi-2026, the reverse lockup meant for navy/photographic grounds) was placed, per invariant 5/brand-binding rules."
+    }
+  ],
+  "assets_used": {
+    "logo": "brand_kit/brand/emplifi-logo-white.svg (reverse lockup, placed at natural 324:96 aspect ratio, width-constrained, height auto)",
+    "fonts": [
+      "brand_kit/fonts/inter_400_normal.ttf",
+      "brand_kit/fonts/inter_500_normal.ttf (loaded but not ultimately needed in final type choices)",
+      "brand_kit/fonts/inter_600_normal.ttf",
+      "brand_kit/fonts/inter_700_normal.ttf"
+    ]
+  },
+  "canvases": [
+    {
+      "name": "square",
+      "width": 1080,
+      "height": 1080,
+      "plate": "square/plate.png",
+      "overlay": "square/overlay.html",
+      "render": "square/render.png"
+    },
+    {
+      "name": "landscape",
+      "width": 1200,
+      "height": 628,
+      "plate": "landscape/plate.png",
+      "overlay": "landscape/overlay.html",
+      "render": "landscape/render.png"
+    },
+    {
+      "name": "portrait",
+      "width": 1080,
+      "height": 1350,
+      "plate": "portrait/plate.png",
+      "overlay": "portrait/overlay.html",
+      "render": "portrait/render.png"
+    },
+    {
+      "name": "story",
+      "width": 1080,
+      "height": 1920,
+      "plate": "story/plate.png",
+      "overlay": "story/overlay.html",
+      "render": "story/render.png"
+    }
+  ],
+  "visual_review_notes": "Reviewed each render.png (not just the HTML) before finishing. Headline reads first and clearly on all four - white 48px bold on flat navy, positioned in the untouched quiet zone every plate reserved for it (top for square/portrait/story, left for the short landscape). Copy never sits on the busy UI panel. The reverse logo holds up cleanly on the navy ground at its placed size. The periwinkle eyebrow color, the periwinkle plate shapes, and the panel's own periwinkle UI accents read as one coherent system rather than three unrelated blues. Composition matches the brand's own description (navy ground, periwinkle circle/arc/line framing a product surface in the lower half) rather than a generic abstract-AI visual. Weakest point: with no CTA in this round the story canvas (1080x1920) carries a large quiet gap between the subhead and the UI panel; left as generous whitespace per brand voice rather than padded with invented copy, but it is the least visually dense of the four and would be the first thing to revisit if a CTA is added in a later revision.",
+  "escalations": "None blocking. All four canvases were completed to spec."
+}

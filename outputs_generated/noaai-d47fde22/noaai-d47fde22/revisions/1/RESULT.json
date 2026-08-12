@@ -1,0 +1,53 @@
+{
+  "status": "completed",
+  "campaign": "noaAI",
+  "brand_kit_id": "bk-kahua-2026",
+  "canvases": [
+    {
+      "name": "square",
+      "width": 1080,
+      "height": 1080,
+      "plate": "square/plate.png",
+      "overlay": "square/overlay.html",
+      "render": "square/render.png"
+    },
+    {
+      "name": "landscape",
+      "width": 1200,
+      "height": 628,
+      "plate": "landscape/plate.png",
+      "overlay": "landscape/overlay.html",
+      "render": "landscape/render.png"
+    }
+  ],
+  "copy_used": {
+    "eyebrow": "INTRODUCING KAHUA AI",
+    "headline": "Ask Noa where the change order stands.",
+    "subhead": "Noa retrieves records and automates the busywork inside Kahua — built for PMs buried in RFIs and submittals.",
+    "cta": null,
+    "legal": null
+  },
+  "how_copy_was_derived": "job/request.json shipped empty strings for headline/subhead/eyebrow/cta. The brief gave an explicit example line ('Ask Noa where the change order stands.') and a plain, non-hype description of what Noa does (retrieves/automates inside the secure platform, for PMs buried in RFIs/submittals). Used the brief's example verbatim as the h1 headline, wrote one body-scale subhead paraphrasing the brief's functional description, and wrote a short caption-scale eyebrow announcing the feature. No CTA was written: the brief and request both left cta/cta_href blank with no suggested action, and inventing button copy with no basis in the brief or DESIGN.md voice guidance felt riskier than omitting it, so both canvases ship without a CTA element.",
+  "type_scale_compliance": {
+    "eyebrow": "caption / 14px / Barlow 600, letterspaced, accent orange -- matches DESIGN.md 'Applying it' exactly.",
+    "headline": "h1 / 48px / Barlow 700 -- used DESIGN.md's explicit override ('An h1 is 48px on every canvas... if it does not fit at 48, cut the copy') rather than the 56px figure in the type-scale table, and used the same 48px on both the square and landscape canvas even though the landscape canvas is shorter -- did not scale it down to fit the shorter canvas, per the standing instruction. Headline wraps to two lines on both canvases at 48px, which is what made it fit without resizing type.",
+    "subhead": "body / 17px / Barlow 400 -- used body, not h3, for the subordinate copy line, even though 17px reads small next to the photo.",
+    "logo_wordmark": "not a type-scale value; it is the vector logo file, sized by its own box, not typeset."
+  },
+  "brand_data_inconsistencies_found": [
+    {
+      "issue": "DESIGN.md names 'Barlow Condensed' as the heading font family, but brand_kit/fonts/ ships only four Barlow (non-condensed) weights (400/500/600/700) -- there is no Barlow Condensed file anywhere in the brain.",
+      "resolution": "Per invariant 5/asset rules, did not substitute a browser fallback or a different vendor's condensed face. Used the brand's own Barlow 700 (regular width) for the h1 headline instead of the named condensed cut, since it is the closest available weight actually shipped in fonts/. This is a real gap between DESIGN.md and the shipped asset kit that should be fixed upstream (either DESIGN.md corrected to 'Barlow', or a Barlow Condensed family added to fonts/). Flagging rather than silently treating the two as equivalent."
+    },
+    {
+      "issue": "asset_manifest.json lists a 'logo_reverse' asset at brand/kahua-logo-white.svg (for grounds darker than #6B7A88, i.e. exactly this photography), but no such file exists in brand_kit/brand/ -- only kahua-logo.svg (dark wordmark) and kahua-mark.svg are actually present.",
+      "resolution": "Both plates are dark, dusk-lit photography, which is the exact condition the manifest says calls for the reverse logo. Since that asset does not exist as an openable file, did not recolor, redraw or fake a white version of the wordmark (forbidden by invariant 4). Instead placed the real dark kahua-logo.svg, unmodified, inside a small solid-white 4px-radius card -- consistent with DESIGN.md's own card/container treatment -- so the logo has the contrast it needs without altering the asset itself. Escalating that the reverse logo asset should be added to brand_kit/brand/ so future dark-background placements don't need this workaround."
+    }
+  ],
+  "what_i_could_not_do": [
+    "Could not render the headline in true Barlow Condensed because that font file is not shipped in this brand kit (see inconsistencies above); used Barlow 700 instead and noted the gap rather than fabricating or fallback-substituting a condensed face.",
+    "Did not add a CTA button/label to either canvas because the request's cta and cta_href fields were empty and the brief supplied no call-to-action language; adding one would have meant inventing copy with no source in the brief or DESIGN.md, which the skill contract prohibits."
+  ],
+  "structural_checks": "Both canvases: exact pixel dimensions requested; single full-bleed plate per canvas at those exact dimensions (uniform scale, no crop/stretch -- plate generated at target aspect ratio and delivered at exact target size by call_gpt_image.py); plate is textless, logo-free, CTA-free jobsite photography; every string (eyebrow, headline, subhead) is a positioned HTML text node with data-cq-role=\"text\"; logo is the unmodified brand SVG placed in a sized wrapper with data-cq-role=\"logo\", max-width/max-height/object-fit:contain preserving its natural aspect ratio; no overlay elements overlap; all fonts are the brand's own Barlow ttf files loaded via @font-face from brand_kit/fonts/, no browser fallback.",
+  "visual_review_notes": "Viewed both render.png files directly. Headline is the first and clearly the largest thing read on both canvases, sitting on the calm dusk-sky portion of the plate rather than the busy scaffolding/subject side. Subhead and eyebrow are legible against the dark navy ground. The logo card holds up on the dark, textured photography instead of disappearing into it. Voice matches the brief: plain, functional, no hype language. Weakest point of the ad: there is no CTA, so it ends on the subhead with no explicit next action -- accepted deliberately given the blank cta/cta_href in the request, but flagged here as a real tradeoff a stakeholder should confirm before this runs live."
+}
