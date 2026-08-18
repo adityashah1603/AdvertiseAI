@@ -18,12 +18,19 @@ node_modules/
 .next/
 dist/
 build/
+*.tsbuildinfo
 
 # OS noise
 .DS_Store
 Thumbs.db
 
+# Raw deliverable archives — unzipped copies are what's tracked
+# (design-brains/, inspirations/, starter/)
+/design-brains.zip
+/inspirations.zip
+/starter.zip
 
+# Brand assets we can't redistribute (trademark/logo restrictions)
 third-brand-test/
 worker/sandbox_images/generation/phase0/duolingo_1080x1080/
 worker/sandbox_images/generation/phase0/duolingo_1080x1350/

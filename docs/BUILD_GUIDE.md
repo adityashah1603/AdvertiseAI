@@ -8,8 +8,8 @@ definition of done.
 ## How to use this document
 
 1. Read in this order before writing anything: `SKILL.md` →
-   `design-brains/design-brains/emplifi/DESIGN.md` →
-   `design-brains/design-brains/kahua/DESIGN.md` → `ROADMAP.md` →
+   `design-brains/emplifi/DESIGN.md` →
+   `design-brains/kahua/DESIGN.md` → `ROADMAP.md` →
    `DECISIONS.md` → this file.
 2. Execute steps **in order**. Every step after Step 1 assumes the previous
    step's "Definition of done" is actually true, not assumed true. If a
@@ -135,7 +135,7 @@ can say in one sentence what would make you reject one you generated.
   `revisions`, `assets`, `comments`, `runs`, `deploys`) as Supabase
   migrations.
 - Create the storage layout from `ROADMAP.md` §3.2.
-- Write a seed script that reads `design-brains/design-brains/{emplifi,kahua}`
+- Write a seed script that reads `design-brains/{emplifi,kahua}`
   from this repo and uploads each into `brand-kits/{tenant_id}/` in Storage,
   inserting the corresponding `tenants` rows.
 

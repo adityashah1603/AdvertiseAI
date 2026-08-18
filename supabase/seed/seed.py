@@ -31,12 +31,12 @@ BRANDS = [
     {
         "slug": "emplifi",
         "name": "Emplifi",
-        "local_dir": os.path.join(ROOT, "design-brains", "design-brains", "emplifi"),
+        "local_dir": os.path.join(ROOT, "design-brains", "emplifi"),
     },
     {
         "slug": "kahua",
         "name": "Kahua",
-        "local_dir": os.path.join(ROOT, "design-brains", "design-brains", "kahua"),
+        "local_dir": os.path.join(ROOT, "design-brains", "kahua"),
     },
     {
         "slug": "duolingo",

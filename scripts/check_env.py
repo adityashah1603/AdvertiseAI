@@ -1,5 +1,5 @@
 """
-Local preflight check for BUILD_GUIDE.md Step 0.
+Local preflight check for docs/BUILD_GUIDE.md Step 0.
 
 Runs on YOUR machine, not inside a sandbox. Its only job is to tell you,
 before any real building starts, which of the credentials in .env are

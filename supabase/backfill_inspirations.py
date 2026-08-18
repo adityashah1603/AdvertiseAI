@@ -4,7 +4,7 @@ One-time backfill, companion to onboarding.py's new inspirations_bucket:
   1. Ensures every existing tenant has an inspirations_bucket (via
      onboard_tenant()'s idempotent backfill path - safe to call repeatedly,
      never re-creates or touches an already-set bucket).
-  2. Uploads this repo's legacy inspirations/inspirations/*.png files into
+  2. Uploads this repo's legacy inspirations/*.png files into
      the matching tenant's new bucket, matched by filename prefix
      (emplifi-* -> emplifi, kahua-* -> kahua).
 
@@ -28,7 +28,7 @@ sys.path.insert(0, os.path.join(ROOT, "supabase"))
 
 from onboarding import get_client, onboard_tenant  # noqa: E402
 
-LEGACY_INSPIRATIONS_DIR = os.path.join(ROOT, "inspirations", "inspirations")
+LEGACY_INSPIRATIONS_DIR = os.path.join(ROOT, "inspirations")
 
 
 def main():

@@ -6,7 +6,7 @@ ad, a human iterates on it via pinned comments, and a second AI agent deploys th
 final ad into a stand-in ad platform ("Adstream") using a real browser.
 
 Read this entire file before writing code. Read `SKILL.md` and both
-`design-brains/design-brains/*/DESIGN.md` files next. They are the actual product
+`design-brains/*/DESIGN.md` files next. They are the actual product
 spec; this file is the engineering plan on top of them.
 
 ---
@@ -312,7 +312,7 @@ a database problem.
 ### Phase 0 — Local skill gate (no sandbox, no backend)
 
 Run the ad-generation skill directly in a local Claude Code/Codex session against
-both `design-brains/design-brains/{emplifi,kahua}` brains. Goal: on demand,
+both `design-brains/{emplifi,kahua}` brains. Goal: on demand,
 produce on-brand ads you would show a customer, for both brands, at all four
 canvas sizes (1080×1080, 1200×628, 1080×1350, 728×90), reliably and in bulk
 (~20 ads). If any target size can't be produced by your sizing/plate-generation

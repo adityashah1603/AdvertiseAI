@@ -2,7 +2,7 @@
 
 What a customer's brand looks like inside CharacterQuilt - synthesized from
 public research rather than a customer submission, same shape as
-`design-brains/design-brains/emplifi/` and `design-brains/design-brains/kahua/`.
+`design-brains/emplifi/` and `design-brains/kahua/`.
 
 | | |
 |---|---|
@@ -10,7 +10,7 @@ public research rather than a customer submission, same shape as
 | `fonts/` | Space Grotesk and Space Mono (both SIL OFL, Google Fonts), standing in for Oatly's real (proprietary, unbundleable) typefaces. |
 | `brand/asset_manifest.json` | Staged logo and media paths, with the kit id. |
 | `brand/tokens.json` | A cached export from brand-sync. |
-| `requests/` | A new-job request and an edit-job request against it, in this project's own request shape - see `starter/starter/README.md` for what these files are and are not. |
+| `requests/` | A new-job request and an edit-job request against it, in this project's own request shape - see `starter/README.md` for what these files are and are not. |
 
 Inspirations are not in here. They ship separately.
 
