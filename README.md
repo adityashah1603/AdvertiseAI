@@ -1,4 +1,4 @@
-# AI powered Advertisement generator to run any campaign withing minutes
+# AI powered Advertisement generator to run any campaign within minutes
 
 A customer's brand plus
 a request goes in, an AI agent generates an on-brand ad, a human iterates on
