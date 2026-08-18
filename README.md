@@ -1,6 +1,6 @@
-# CharacterQuilt Design Engine (work trial)
+# AI powered Advertisement generator to run any campaign withing minutes
 
-A small but real version of CharacterQuilt's product: a customer's brand plus
+A customer's brand plus
 a request goes in, an AI agent generates an on-brand ad, a human iterates on
 it via pinned comments, and a second AI agent deploys the final ad into a
 stand-in ad platform ("Adstream") using a real browser.
@@ -25,7 +25,6 @@ See `docs/ROADMAP.md` for the full design.
 | `inspirations/` | Reference-only creative examples per brand (never a source of color/type/copy). |
 | `starter/` | Example request payloads in this project's request shape. |
 | `outputs_generated/` | Real runs of the pipeline — generated ads, agent transcripts, and results, kept as evidence of behavior. |
-| `claude_session/` | Claude Code session transcripts from building this project. |
 | `scripts/` | Local preflight tooling (env/credential checks) — never touches billable resources. |
 | `docs/` | Planning docs, decisions, and findings from building this (see `docs/README.md`). |
 
@@ -50,3 +49,13 @@ Start with `docs/ROADMAP.md` (architecture), then `SKILL.md` (the agent's
 actual product spec) and `docs/BUILD_GUIDE.md` (the ordered build plan). See
 `docs/README.md` for the full index — including `docs/DECISIONS.md`,
 `docs/FLOW.md`, and `docs/FINDINGS.md`.
+
+
+## A few generated Advertisements:
+
+
+![Project Screenshot](outputs_generated\emplifi\2026-gartner-leader-3844daae\2026-gartner-leader-3844daae\revisions\1\story\render.png)
+
+![Project Screenshot](outputs_generated\kahua\noaai-d47fde22\noaai-d47fde22\revisions\1\square\render.png)
+
+
